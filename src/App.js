@@ -12,7 +12,7 @@ function App({ Component, pageProps }) {
      <Router>
     <Routes>
         <Route path='/login' element= {<Login/>}/>
-        <Route path='/login' element= {<Registration/>}/>
+        <Route path='/register' element= {<Registration/>}/>
     </Routes>
 </Router>
     </div>
