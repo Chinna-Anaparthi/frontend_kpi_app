@@ -26,7 +26,7 @@ const Login = () => {
 
   const getRoleBasedRoute = () => {
     const role = localStorage.getItem('role');
-    const firstname1 = localStorage.getItem('firstname');
+
 
 
     console.log(role);
@@ -140,7 +140,7 @@ const Login = () => {
           <img
             className="miracleLogo"
             src={'https://hubble.miraclesoft.com/assets/img/miracle-logo-white.svg'}
-            alt="Image Description"
+            alt="Not Found"
           />
           <p className="loginText">Enter Your Details to Continue</p>
         </div>
@@ -195,14 +195,12 @@ const Login = () => {
             />
           </div>
 
-          <Link to='/resetpwd' className='ForgotPwd' style={{ marginTop: "2%" }}>Forgot Password?</Link>
+          <Link to='/forgotPwd' className='ForgotPwd' style={{ marginTop: "2%" }}>Forgot Password?</Link>
           <Button type="submit" variant="contained" style={{fontWeight:'bold'}} >
             Login
           </Button>
           {error && <div className="error">{error}</div>}
-          {/* <p style={{ color: 'white' }} className="registering">
-          Don't have an account please <Link to="/register" style={{ color: 'white' }}>REGISTER!</Link>
-        </p> */}
+      
 
           <p style={{ color: 'white' }} className="registering">
             Don't have an account please{' '}
