@@ -16,11 +16,8 @@ function App() {
     <Routes>
         <Route path='/login' element= {<Login/>}/>
         <Route path='/register' element= {<Registration/>}/>
-<<<<<<< HEAD
         <Route path='/metric' element= {<AddMetrics/>}/>
-=======
         <Route path='/forgotPwd' element= {<ForgotPassword/>}/>
->>>>>>> 5a279dbb907d86e96725cccc652a8efe43d78809
         <Route path='*' element={<NotFound />}/>
     </Routes>
 </Router>
