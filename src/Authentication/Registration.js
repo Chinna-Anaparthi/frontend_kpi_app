@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { TextField, MenuItem, Button, FormControl, InputLabel, Select, Grid, Paper, InputAdornment, Dialog, DialogContent, DialogContentText, DialogActions, Box } from '@mui/material';
+import { TextField, MenuItem, Button, FormControl, InputLabel, Select, Grid, Paper, InputAdornment, Dialog, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
@@ -265,9 +265,21 @@ export default function Registration() {
     navigate('/login');
   };
 
+  const register_background = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    backgroundImage: 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgF-M-xDaQ55G5hE34-Lh3JIJrhsm8Y_Dq4Yhq4rk6Ku4zHAvP9mp8om5K3lccN2ECz9o&usqp=CAU")', // URL enclosed in quotes
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+};
+
+
+
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#dcedf5' }}>
+    <div style={register_background}>
       <Paper style={{ padding: '15px', width: '45vw', }}>
 
         <h2 style={{ textAlign: 'center', textTransform: 'uppercase' }}>Registration Form</h2>
@@ -377,11 +389,11 @@ export default function Registration() {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-           
+
               <FormControl fullWidth>
                 <InputLabel >Role</InputLabel>
                 <Select
-               
+
                   name="Role"
                   value={formData.Role}
                   onChange={handleChange}
@@ -400,7 +412,7 @@ export default function Registration() {
                   ))}
                 </Select>
               </FormControl>
-             
+
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
@@ -527,7 +539,7 @@ export default function Registration() {
                   </Button>
                 </DialogActions>
               </Dialog>
-              <Button type="submit" variant="contained" style={{ width: inputWidth, height: inputHeight, backgroundColor:'#00aaee', color:'white' }} disabled={!isFormFilled}>
+              <Button type="submit" variant="contained" style={{ width: inputWidth, height: inputHeight, backgroundColor: '#00aaee', color: 'white' }} disabled={!isFormFilled}>
                 Register
               </Button>
             </Grid>

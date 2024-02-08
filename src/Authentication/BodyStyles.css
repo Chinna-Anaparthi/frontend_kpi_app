@@ -1,5 +1,73 @@
-.background{
-    /* background-image: url('src/bg-login.jpg');
-   
-    background-repeat: no-repeat;  */
+.background {
+    min-height: 100vh;
+    display: flex;
+    background-color: #c4d9f5;
+    overflow: auto
+}
+
+
+.content-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+
+.forgot-password-container {
+    flex: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.griding {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    /* Center horizontally */
+}
+
+.heading {
+    text-align: center;
+    font-size: 50px;
+    color: #272773
+}
+
+.image {
+    width: 100%;
+    height: auto;
+}
+
+.image-container {
+    flex: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.paragraph {
+    font-size: 22px;
+    text-align: center;
+    color: #272773
+}
+
+.password-reset-container {
+    margin: 0 auto; /* Center horizontally */
+  }
+  
+  @media (max-width: 425px) {
+    .password-reset-container {
+      max-width: 90%; /* Adjust to your preference */
+    }
+  }
+  
+
+@media (max-width: 425px) {
+    .image-container {
+        display: none;
+    }
+
+    .forgot-password-container {
+        flex: 100%;
+    }
 }
