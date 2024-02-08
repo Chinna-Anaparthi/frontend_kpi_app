@@ -1,8 +1,10 @@
 import React,{useEffect,useState} from 'react'
 import ServiceHelper from '../ServiceHelper/ServiceHelper'
+
 export default function AddMetrics()  {
   const [method, setMethod] = useState()
   const [apiGet,setApiGet] = useState()
+
 
   useEffect(() => {
   setMethod('get')
@@ -24,7 +26,7 @@ if(apiGet!== undefined){
  
 return (
   <div>
-    <h1>Sai</h1>
+    
       {method === 'get' && (
       <ServiceHelper
         path='api/getMetrics'
