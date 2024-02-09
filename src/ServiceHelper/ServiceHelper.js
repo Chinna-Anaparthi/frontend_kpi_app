@@ -32,10 +32,10 @@ export default class ServiceHelper extends React.Component {
 		const { method, path, input, optHeaders } = this.props
 		this.setState({ loading: true })
 		if (!method || method === 'get') {
-            console.log(`${api}/${path}`,"37");
+            // console.log(`${api}/${path}`,"37");
 			customAxios({ method: 'get', url: `${api}/${path}`, timeout: 30000, params: input })
 				.then((response) => {
-                    console.log(response,"40");
+                    // console.log(response,"40");
 					this.validateAndRespond(response.data)
 				})
 				.catch((error) => {

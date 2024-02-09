@@ -7,25 +7,28 @@ import Registration from './Authentication/Registration';
 import ForgotPassword from './Authentication/ForgotPassword';
 import NotFound from './NotFound';
 import Employee from './Employee/Employee.js';
+import AddEmployeeKPI from './Admin/AddEmployeeKPI.js';
+import AddManagerKPI from './Admin/AddManagerKPI.js';
+import AddDirectorKPI from './Admin/AddDirectorKPI.js';
 
 
-        
+
 function App() {
   return (
     <div className="App">
-     <Router>
-    <Routes>
-        <Route path='/login' element= {<Login/>}/>
-        <Route path='/register' element= {<Registration/>}/>
-        <Route path='/metric' element= {<AddMetrics/>}/>
-        <Route path='/forgotPwd' element= {<ForgotPassword/>}/>
-<<<<<<< HEAD
-        <Route path='/employee' element= {<Employee/>}/>
-=======
->>>>>>> 28aca5f09ac12b534e68ab3e5c2abc0c60216e5c
-        <Route path='*' element={<NotFound />}/>
-    </Routes>
-</Router>
+      <Router>
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Registration />} />
+          <Route path='/metric' element={<AddMetrics />} />
+          <Route path='/metric' element={<AddEmployeeKPI />} />
+          <Route path='/metric' element={<AddManagerKPI />} />
+          <Route path='/metric' element={<AddDirectorKPI />} />
+          <Route path='/forgotPwd' element={<ForgotPassword />} />
+          <Route path='/employee' element={<Employee />} />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
