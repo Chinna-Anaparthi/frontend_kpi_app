@@ -3,46 +3,20 @@ import ServiceHelper from '../ServiceHelper/ServiceHelper';
 import AddEmployeeKPI from './AddEmployeeKPI';
 import AddManagerKPI from './AddManagerKPI';
 import AddDirectorKPI from './AddDirectorKPI';
-import Drawer from '@mui/material/Drawer';
-import { Button } from '@mui/material';
-import DehazeIcon from '@mui/icons-material/Dehaze';
+
 
 export default function AddMetrics() {
   // State Declarations
   const [method, setMethod] = useState();
-  const [apiDataFetched, setApiDataFetched] = useState(false);
   const [apiGet, setApiGet] = useState();
   const [employeeKPI, setEmployeeKPI] = useState();
   const [managerKPI, setManagerKPI] = useState();
   const [directorKPI, setDirectorKPI] = useState();
   const [selectedRole, setSelectedRole] = useState(null); // State to track selected role
 
+
   // Variable Declaration
   const roles = ["Employee", "Manager", "Director"]; // DropDown
-
-  const toggleDrawer = () => {
-    setMethod(method === 'get' ? null : 'get');
-  };
-
-  const list = () => (
-    <div
-      style={{
-        width: 200,
-        height: '100%',
-        backgroundColor: '#282828',
-        color: 'white',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        lineHeight: '40px',
-      }}
-    >
-
-      {roles.map((role, index) => (
-        <div key={index} style={{ marginBottom: '10px', cursor: 'pointer', marginLeft: '20px' }} onClick={() => setSelectedRole(role)}>{role}</div>
-      ))}
-    </div>
-  );
 
 
   useEffect(() => {
@@ -50,30 +24,26 @@ export default function AddMetrics() {
   }, []);
 
   useEffect(() => {
-    if (apiGet && !apiDataFetched) {
+    if (apiGet !== undefined) {
       apiGet.forEach(element => {
         if (element.role === 'employee') {
-          setEmployeeKPI(element);
+
+          setEmployeeKPI(element)
         }
         if (element.role === 'manager') {
-          setManagerKPI(element);
+          console.log(element, "12");
+          setManagerKPI(element)
         }
         if (element.role === 'director') {
-          setDirectorKPI(element);
+          console.log(element, "12");
+          setDirectorKPI(element)
         }
       });
-      setApiDataFetched(true);
     }
-  }, [apiGet, apiDataFetched]);
+  }, [apiGet])
 
   return (
     <div>
-      {/* Sidebar */}
-      <div style={{ width: '20%', position: 'fixed', top: '0', bottom: '0' }}>
-        <Drawer anchor="left" open={method === 'get'} onClose={toggleDrawer}>
-          {list()}
-        </Drawer>
-      </div>
       {method === 'get' && (
         <ServiceHelper
           path='api/getMetrics'
@@ -86,16 +56,16 @@ export default function AddMetrics() {
           }}
         />
       )}
-      {/* Header and Content */}
-      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '20%', paddingTop: '60px' }}>
-        {/* Header with DehazeIcon */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #ccc', position: 'fixed', top: '0', width: '80%' }}>
-        
-          <Button onClick={toggleDrawer}><DehazeIcon /></Button>
+      ADMIN ADD KPI
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <div style={{ width: '10%', backgroundColor: '#282828', color: 'white', padding: '20px', display: 'flex', flexDirection: 'column' }}>
+          {/* Render sidebar */}
+          {roles.map((role, index) => (
+            <div key={index} style={{ marginBottom: '10px', cursor: 'pointer', }} onClick={() => setSelectedRole(role)}>{role}</div>
+          ))}
         </div>
 
-        {/* Main content */}
-        <div style={{ width: '80%', padding: '20px' }}>
+        <div style={{ width: '80%' }}>
           {/* Conditionally render selected role component */}
           {selectedRole === "Employee" && (
             <AddEmployeeKPI
@@ -115,8 +85,6 @@ export default function AddMetrics() {
         </div>
       </div>
     </div>
-
-
   );
 }
 

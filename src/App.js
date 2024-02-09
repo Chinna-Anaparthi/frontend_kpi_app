@@ -1,7 +1,7 @@
 
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import AddMetrics from './Admin/AddMetrics.js';
+import AddMetrics from './Admin/KPIMetric.js';
 import Login from './Authentication/Login';
 import Registration from './Authentication/Registration';
 import ForgotPassword from './Authentication/ForgotPassword';
@@ -10,6 +10,7 @@ import Employee from './Employee/Employee.js';
 import AddEmployeeKPI from './Admin/AddEmployeeKPI.js';
 import AddManagerKPI from './Admin/AddManagerKPI.js';
 import AddDirectorKPI from './Admin/AddDirectorKPI.js';
+import PersistentDrawerLeft from './PersistentDrawer.js';
 
 
 
@@ -21,11 +22,12 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Registration />} />
           <Route path='/metric' element={<AddMetrics />} />
-          <Route path='/metric' element={<AddEmployeeKPI />} />
-          <Route path='/metric' element={<AddManagerKPI />} />
-          <Route path='/metric' element={<AddDirectorKPI />} />
+          <Route path='/addEmployee' element={<AddEmployeeKPI />} />
+          <Route path='/addManager' element={<AddManagerKPI />} />
+          <Route path='/addDirector' element={<AddDirectorKPI />} />
           <Route path='/forgotPwd' element={<ForgotPassword />} />
           <Route path='/employee' element={<Employee />} />
+          <Route path='/drawer' element={<PersistentDrawerLeft />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </Router>
