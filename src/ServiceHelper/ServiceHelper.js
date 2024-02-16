@@ -4,7 +4,7 @@ import axios from 'axios'
 
 
 const headers = { 'Content-Type': 'application/json' }
-const api = 'http://172.17.15.150:3000'
+const api = 'http://172.17.15.150:8080'
 
 const customAxios = axios.create({
     baseURL:api, 
@@ -30,6 +30,7 @@ export default class ServiceHelper extends React.Component {
    
 	componentDidMount () {
 		const { method, path, input, optHeaders } = this.props
+		console.log(method,input,path,"33");
 		this.setState({ loading: true })
 		if (!method || method === 'get') {
             // console.log(`${api}/${path}`,"37");
@@ -44,7 +45,7 @@ export default class ServiceHelper extends React.Component {
 		}
 		if (method === 'post') {
 			//console.log(optHeaders)
-			//console.log(input)
+			console.log(input,method,path,'47')
 			customAxios
 				.post(`${api}/${path}`, input, { headers: optHeaders ? optHeaders : headers })
 				.then((response) => {

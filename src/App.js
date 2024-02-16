@@ -10,7 +10,8 @@ import Employee from './Employee/Employee.js';
 import AddEmployeeKPI from './Admin/AddEmployeeKPI.js';
 import AddManagerKPI from './Admin/AddManagerKPI.js';
 import AddDirectorKPI from './Admin/AddDirectorKPI.js';
-import PersistentDrawerLeft from './PersistentDrawer.js';
+import PersistentDrawerLeft from './Admin/PersistentDrawer.js';
+import EmployeeAdd from './Admin/EmployeeAdd.js';
 
 
 
@@ -28,6 +29,8 @@ function App() {
           <Route path='/forgotPwd' element={<ForgotPassword />} />
           <Route path='/employee' element={<Employee />} />
           <Route path='/drawer' element={<PersistentDrawerLeft />} />
+          
+          <Route path='/emp' element={<EmployeeAdd />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </Router>

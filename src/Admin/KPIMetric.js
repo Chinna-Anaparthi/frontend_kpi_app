@@ -5,6 +5,7 @@ import AddManagerKPI from './AddManagerKPI';
 import AddDirectorKPI from './AddDirectorKPI';
 
 
+
 export default function AddMetrics() {
   // State Declarations
   const [method, setMethod] = useState();
@@ -16,7 +17,7 @@ export default function AddMetrics() {
 
 
   // Variable Declaration
-  const roles = ["Employee", "Manager", "Director"]; // DropDown
+  const roles = ["KPI Metrics","Employee", "Manager", "Director"]; // DropDown
 
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function AddMetrics() {
 
   return (
     <div>
+      
       {method === 'get' && (
         <ServiceHelper
           path='api/getMetrics'
@@ -67,6 +69,7 @@ export default function AddMetrics() {
 
         <div style={{ width: '80%' }}>
           {/* Conditionally render selected role component */}
+         
           {selectedRole === "Employee" && (
             <AddEmployeeKPI
               employeeKPI={employeeKPI}
