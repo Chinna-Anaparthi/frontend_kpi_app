@@ -19,6 +19,7 @@ import AddManagerKPI from './AddManagerKPI';
 import AddDirectorKPI from './AddDirectorKPI';
 import { Alert, Button, Snackbar, } from '@mui/material';
 import ChipInput from 'material-ui-chip-input';
+import { makeStyles } from '@mui/styles';
 import {
   Table,
   TableBody,
@@ -80,6 +81,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [metricsID, setMetricsID] = useState(null)
   const [method, setMethod] = useState();
   const [apiGet, setApiGet] = useState();
   const [employeeKPI, setEmployeeKPI] = useState();
@@ -89,14 +91,20 @@ export default function PersistentDrawerLeft() {
   const [category, setCategory] = useState()
   const [subCategory, setSubCategory] = useState()
   const [metrics, setMetrics] = useState()
-  const [metricsApiPost, setMetricsApiPost] = useState(null)
+  const [metricsApiGet, setMetricsApiGet] = useState([])
   const [tableData, setTableData] = useState([]);
   const [opensnack, setOpenSnack] = useState(false);
+  const [isChipInputSubDisabled, setIsChipInputSubDisabled] = useState(false);
+  const [isChipInputMetricDisabled, setIsChipInputMetricDisabled] = useState(false);
+  const [isSaveDisable, setIsSaveDisable] = useState(false);
+
   const roles = ["KPI Metrics", "Employee", "Manager", "Director"];
 
   const handleClick = () => {
     setOpenSnack(true);
   };
+
+
 
   const handleCloseSnack = (event, reason) => {
     if (reason === 'clickaway') {
@@ -152,42 +160,98 @@ export default function PersistentDrawerLeft() {
   };
 
   const handleAddCategory = (value) => {
+
     setCategory(value);
+    setIsChipInputSubDisabled(true)
   };
 
   const handleAddSubCategory = (value) => {
     setSubCategory(value);
+    setIsChipInputMetricDisabled(true)
   };
 
   const handleAddMetric = (value) => {
     setMetrics(value);
+    setIsSaveDisable(true)
   };
 
   const handleSave = (value1, value2, value3) => {
-    const reqBody = {
-      category: value1,
-      subCategory: value2,
-      metrics: value3
-    };
-
-    fetch('http://172.17.15.150:8080/api/addCategoryQuestions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify([reqBody])
-    })
-      .then((response) => {
-        if (response.ok) {
-          setMetricsApiPost(reqBody);
-          console.log('Data posted successfully');
-        } else {
-          console.error('Error posting data');
+    if (metricsID !== null && metricsID) {
+      metricsApiGet.forEach((element) => {
+        if (value1.length !== 0) {
+          value1.forEach((ele) => {
+            if (!element.category.includes(ele)) {
+              element.category.push(ele)
+            }
+            console.log(element.category, '177');
+          })
+        }
+        if (value2.length !== 0) {
+          value2.forEach((ele) => {
+            if (!element.subCategory.includes(ele)) {
+              element.subCategory.push(ele)
+            }
+            console.log(element.subCategory, '177');
+          })
+        }
+        if (value3.length !== 0) {
+          value3.forEach((ele) => {
+            if (!element.metrics.includes(ele)) {
+              element.metrics.push(ele)
+            }
+            console.log(element.metrics, '177');
+          })
         }
       })
-      .catch((error) => {
-        console.error('Network error:', error);
-      });
+      console.log(metricsApiGet, "203");
+      //  console.log(...metricsApiGet, reqBody, '177');
+      fetch('http://172.17.15.150:8080/api/addCategoryQuestions/' + metricsID, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(metricsApiGet[0])
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log(response, '182');
+            // setMetricsApiPost(reqBody);
+            console.log('Data posted successfully');
+          } else {
+            console.error('Error posting data');
+          }
+        })
+        .catch((error) => {
+          console.error('Network error:', error);
+        });
+
+    } else {
+      const reqBody = {
+        category: value1,
+        subCategory: value2,
+        metrics: value3
+      };
+      fetch('http://172.17.15.150:8080/api/addCategoryQuestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reqBody)
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log(response, '182');
+            // setMetricsApiPost(reqBody);
+            console.log('Data posted successfully');
+          } else {
+            console.error('Error posting data');
+          }
+        })
+        .catch((error) => {
+          console.error('Network error:', error);
+        });
+
+    }
 
     if (selectedRole === "KPI Metrics") {
       const newData = {
@@ -198,7 +262,7 @@ export default function PersistentDrawerLeft() {
 
       // Create a new array by appending the new data to the existing tableData
       const updatedTableData = [...tableData, newData];
-
+      console.log(updatedTableData, '202');
       // Set the updated tableData
       setTableData(updatedTableData);
 
@@ -210,9 +274,21 @@ export default function PersistentDrawerLeft() {
   };
 
 
-  const showStatus = (value) => {
-    setMethod('')
-  }
+  useEffect(() => {
+    fetch('http://172.17.15.150:8080/api/addCategoryQuestions')
+      .then((response) => response.json())
+      .then((response) => {
+
+        setMetricsID(response.data[0]._id)
+        setMetricsApiGet(response.data);
+
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      })
+  }, [])
+
+  console.log(metricsApiGet, "283");
   // console.log(metricsApiPost, "188", method);
   return (
     <div>
@@ -334,6 +410,7 @@ export default function PersistentDrawerLeft() {
                       fullWidth
                       value={subCategory}
                       onChange={(chip) => handleAddSubCategory(chip)}
+                      disabled={!isChipInputSubDisabled}
                     />
                   </Box>
                 </div>
@@ -347,6 +424,7 @@ export default function PersistentDrawerLeft() {
                       fullWidth
                       value={metrics}
                       onChange={(chip) => handleAddMetric(chip)}
+                      disabled={!isChipInputMetricDisabled}
                     />
                   </Box>
                 </div>
@@ -359,6 +437,7 @@ export default function PersistentDrawerLeft() {
                     handleSave(category, subCategory, metrics);
                     handleClick();
                   }}
+                  disabled = {!isSaveDisable}
                 >
                   Save
                 </Button>
@@ -366,9 +445,9 @@ export default function PersistentDrawerLeft() {
               )}
               <Snackbar
                 open={opensnack}
-                autoHideDuration={3000}
+                autoHideDuration={1000}
                 onClose={handleCloseSnack}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
               >
                 <Alert
                   onClose={handleCloseSnack}
@@ -391,21 +470,44 @@ export default function PersistentDrawerLeft() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {tableData.map((row, index) => (
+                    {metricsApiGet.map((row, index) => (
                       <TableRow key={index}>
-                        <TableCell>{row.category}</TableCell>
-                        <TableCell>{row.subCategory}</TableCell>
-                        <TableCell>{row.metrics}</TableCell>
+                        {/* Render category data */}
+                        <TableCell>
+                          {row.category.map((categoryItem, categoryIndex) => (
+                            <TableRow key={`category-${index}-${categoryIndex}`}>
+                              <TableCell>{categoryItem}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableCell>
+                        {/* Render subCategory data */}
+                        <TableCell>
+                          {row.subCategory.map((subCategoryItem, subCategoryIndex) => (
+                            <TableRow key={`subCategory-${index}-${subCategoryIndex}`}>
+                              <TableCell>{subCategoryItem}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableCell>
+                        {/* Render metrics data */}
+                        <TableCell>
+                          {row.metrics.map((metricsItem, metricsIndex) => (
+                            <TableRow key={`metrics-${index}-${metricsIndex}`}>
+                              <TableCell>{metricsItem}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+
               </TableContainer>
             )}
             {/* Conditionally render selected role component */}
             {selectedRole === "Employee" && (
               <AddEmployeeKPI
                 employeeKPI={employeeKPI}
+                metricsApiGet = {metricsApiGet}
               />
             )}
             {selectedRole === "Manager" && (

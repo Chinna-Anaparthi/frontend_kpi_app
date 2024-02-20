@@ -1,168 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    IconButton,
-    Button,
-    Tooltip,
-} from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, FormControl, InputLabel, Button, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-export default function MyTable(props) {
-    const [processKpi, setProcessKpi] = useState([]);
-    const [rows, setRows] = useState([{ category: '', subcategories: [{ subcategory: '', metrics: [{ metric: '', quantityTarget: '' }] }] }]);
-    const [selectedSubcategories, setSelectedSubcategories] = useState([]);
-
-    useEffect(() => {
-        // Sample JSON data
-        const jsonData = {
-            role: "employee",
-            processKpi: [
-                {
-                    categoryName: 'Value Creator',
-                    subcategories: [
-                        {
-                            subCategoryName: 'Trainings attended in cross skills - 2 per quarter',
-                            queries: [{ metric: 'Number of training programs attended.', quantityTarget: null }, { metric: 'Number of training programs in progress', quantityTarget: null }],
-                        },
-                        {
-                            subCategoryName: 'Get Certification - 1 per year',
-                            queries: [{ metric: 'Got the certificate', quantityTarget: null }, { metric: 'Attended for the exam', quantityTarget: null }, { metric: 'Attended for training', quantityTarget: null }],
-                        },
-                    ],
-                },
-                {
-                    categoryName: 'People Development',
-                    subcategories: [
-                        {
-                            subCategoryName: 'Training program to develop others - 2 per quarter',
-                            queries: [{ metric: 'Trainings given', quantityTarget: null }, { metric: 'Training planned', quantityTarget: null }],
-                        },
-                        {
-                            subCategoryName: 'Attend team meetings - 1 per week',
-                            queries: [{ metric: 'No. of meetings attended', quantityTarget: null }, { metric: 'No. of meetings not attended with reason', quantityTarget: null }, { metric: 'No. of meetings not attended without intimation', quantityTarget: null }],
-                        },
-                    ],
-                },
-            ],
-        };
-        setProcessKpi(jsonData.processKpi);
-    }, []);
-
-    const handleCategoryChange = (event, index) => {
-        const updatedRows = [...rows];
-        updatedRows[index].category = event.target.value;
-        setRows(updatedRows);
+const MyTable = () => {
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+    const [selectedMetric, setSelectedMetric] = useState('');
+    const [rows, setRows] = useState([{ category: '', subcategory: '', metrics: [{ metric: '', quantityTarget: '' }] }]);
+    const jsonData = {
+        role: "employee",
+        processKpi: [
+            {
+                categoryName: 'Value Creator',
+                subcategories: [
+                    {
+                        subCategoryName: 'Trainings attended in cross skills - 2 per quarter',
+                        queries: [{ metric: 'Number of  training programs attended.', quantityTarget: null }, { metric: 'Number of training programs in progress', quantityTarget: null }],
+                    },
+                    {
+                        subCategoryName: 'Get Certification - 1 per year',
+                        queries: [{ metric: 'Got the certificate', quantityTarget: null }, { metric: 'Attended for the exam', quantityTarget: null }, { metric: 'Attended for training', quantityTarget: null }],
+                    },
+                ],
+            },
+            {
+                categoryName: 'People Development',
+                subcategories: [
+                    {
+                        subCategoryName: 'Training program to develop others - 2 per quarter',
+                        queries: [{ metric: 'Trainings given', quantityTarget: null }, { metric: 'Training planned', quantityTarget: null }],
+                    },
+                    {
+                        subCategoryName: 'Attend team meetings - 1 per week',
+                        queries: [{ metric: 'No. of meetings attended', quantityTarget: null }, { metric: 'No. of meetings not attended with reason', quantityTarget: null }, { metric: 'No. of meetings not attended without intimation', quantityTarget: null }],
+                    },
+                ],
+            },
+        ],
     };
 
-    const handleSubcategoryChange = (event, index) => {
-        const updatedRows = [...rows];
-        updatedRows[index].subcategories[0].subcategory = event.target.value;
-        setRows(updatedRows);
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+        setSelectedSubCategory('');
+        setSelectedMetric('');
     };
 
-    const handleAddRow = () => {
-        setRows([...rows, { category: '', subcategories: [{ subcategory: '', metrics: [{ metric: '', quantityTarget: '' }] }] }]);
+    const handleSubCategoryChange = (event, rowIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].subcategory = event.target.value;
+        setRows(newRows);
     };
 
-    const handleRemoveRow = (index) => {
-        const updatedRows = [...rows];
-        updatedRows.splice(index, 1);
-        setRows(updatedRows);
+    const handleMetricChange = (event, rowIndex, metricIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics[metricIndex].metric = event.target.value;
+        setRows(newRows);
     };
 
-    const handleAddSubcategory = (index) => {
-        const updatedRows = [...rows];
-        updatedRows[index].subcategories.push({ subcategory: '', metrics: [{ metric: '', quantityTarget: '' }] });
-        setRows(updatedRows);
+    const handleQuantityTargetChange = (event, rowIndex, metricIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics[metricIndex].quantityTarget = event.target.value;
+        setRows(newRows);
     };
 
-    const handleRemoveSubcategory = (rowIndex, subcategoryIndex) => {
-        const updatedRows = [...rows];
-        updatedRows[rowIndex].subcategories.splice(subcategoryIndex, 1);
-        setRows(updatedRows);
+    const handleAddSubcategory = (rowIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics.push({ metric: '', quantityTarget: '' });
+        setRows(newRows);
     };
 
-    const handleAddMetric = (rowIndex, subcategoryIndex) => {
-        const updatedRows = [...rows];
-        updatedRows[rowIndex].subcategories[subcategoryIndex].metrics.push({ metric: '', quantityTarget: '' });
-        setRows(updatedRows);
+    const handleRemoveSubcategory = (rowIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics.pop();
+        setRows(newRows);
     };
 
-    const handleRemoveMetric = (rowIndex, subcategoryIndex, metricIndex) => {
-        const updatedRows = [...rows];
-        updatedRows[rowIndex].subcategories[subcategoryIndex].metrics.splice(metricIndex, 1);
-        setRows(updatedRows);
+    const handleAddMetric = (rowIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics.push({ metric: '', quantityTarget: '' });
+        setRows(newRows);
     };
 
-    const handleMetricChange = (event, rowIndex, subcategoryIndex, metricIndex) => {
-        const updatedRows = rows.map((row, index) => {
-            if (index === rowIndex) {
-                return {
-                    ...row,
-                    subcategories: row.subcategories.map((subcategory, i) => {
-                        if (i === subcategoryIndex) {
-                            return {
-                                ...subcategory,
-                                metrics: subcategory.metrics.map((metric, j) => (j === metricIndex ? { ...metric, [event.target.name]: event.target.value } : metric)),
-                            };
-                        }
-                        return subcategory;
-                    }),
-                };
-            }
-            return row;
-        });
-        setRows(updatedRows);
+    const handleRemoveMetric = (rowIndex, metricIndex) => {
+        const newRows = [...rows];
+        newRows[rowIndex].metrics.splice(metricIndex, 1);
+        setRows(newRows);
     };
 
-    const renderCategoryOptions = () => {
-        return processKpi.map((item) => (
-            <MenuItem key={item.categoryName} value={item.categoryName}>
-                {item.categoryName}
-            </MenuItem>
-        ));
-    };
-
-    const renderSubcategoryOptions = (index) => {
-        const selectedCategory = processKpi.find((item) => item.categoryName === rows[index].category);
-        if (selectedCategory) {
-            return selectedCategory.subcategories.map((sub) => (
-                <MenuItem key={sub.subCategoryName} value={sub.subCategoryName}>
-                    {sub.subCategoryName}
-                </MenuItem>
-            ));
-        }
-        return null;
-    };
-
-    const renderMetricOptions = (index, subcategoryIndex) => {
-        const selectedCategory = processKpi.find((item) => item.categoryName === rows[index].category);
-        if (selectedCategory) {
-            const selectedSubcategory = selectedCategory.subcategories.find((sub) => sub.subCategoryName === rows[index].subcategories[subcategoryIndex].subcategory);
-            if (selectedSubcategory) {
-                return selectedSubcategory.queries.map((query) => (
-                    <MenuItem key={query.metric} value={query.metric}>
-                        {query.metric}
-                    </MenuItem>
-                ));
-            }
-        }
-        return null;
-    };
-
-    const handlePost = () => {
+    const handleSave = () => {
         const formattedData = {
             role: "employee",
             processKpi: rows.map((row) => ({
@@ -170,7 +100,7 @@ export default function MyTable(props) {
                 subcategories: [
                     {
                         subCategoryName: row.subcategory,
-                        queries: row.metrics,
+                        queries: row.metrics
                     },
                 ],
             })),
@@ -202,65 +132,115 @@ export default function MyTable(props) {
 
     return (
         <div>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Category</TableCell>
-                            <TableCell>Subcategory</TableCell>
-                            <TableCell>Metrics</TableCell>
-
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell>
-                                    <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-                                        <InputLabel id={`category-label-${index}`}>Category</InputLabel>
-                                        <Select
-                                            labelId={`category-label-${index}`}
-                                            value={row.category}
-                                            onChange={(e) => handleCategoryChange(e, index)}
-                                            input={<OutlinedInput label="Category" />}
-                                        >
-                                            {renderCategoryOptions()}
-                                        </Select>
-                                    </FormControl>
-                                </TableCell>
-                                <TableCell>
-                                    {
-                                        row.subcategories.map((subcategory, subcategoryIndex) => {
-                                            <div key={subcategoryIndex}>
-
-                                                <FormControl variant='outlined' sx={{ minWidth: 120 }}>
-                                                    <InputLabel id={`subcategory-label-${index}`}>Subcategory</InputLabel>
-                                                    <Select labelId={`subcategory-label-${index}`} value={subcategory.subcategory}
-                                                        onChange={(e) => handleSubcategoryChange(e, index)}
-                                                        input={<OutlinedInput label="Subcategory" />}
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                >
+                    Accordion 1
+                </AccordionSummary>
+                <AccordionDetails>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Category</TableCell>
+                                <TableCell>Sub Category</TableCell>
+                                <TableCell>Metrics</TableCell>
+                                <TableCell>Quantity Target</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row, rowIndex) => (
+                                <TableRow key={rowIndex}>
+                                    <TableCell>
+                                        <FormControl fullWidth>
+                                            <InputLabel id={`category-label-${rowIndex}`}>Category</InputLabel>
+                                            <Select
+                                                labelId={`category-label-${rowIndex}`}
+                                                id={`category-select-${rowIndex}`}
+                                                value={selectedCategory}
+                                                onChange={handleCategoryChange}
+                                            >
+                                                {jsonData.processKpi.map((category, index) => (
+                                                    <MenuItem key={index} value={category.categoryName}>{category.categoryName}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                    <TableCell>
+                                        <FormControl fullWidth>
+                                            <InputLabel id={`subcategory-label-${rowIndex}`}>Subcategory</InputLabel>
+                                            <Select
+                                                labelId={`subcategory-label-${rowIndex}`}
+                                                id={`subcategory-select-${rowIndex}`}
+                                                value={row.subcategory}
+                                                onChange={(event) => handleSubCategoryChange(event, rowIndex)}
+                                            >
+                                                {selectedCategory && jsonData.processKpi.find(category => category.categoryName === selectedCategory)
+                                                    .subcategories.map((subcategory, index) => (
+                                                        <MenuItem key={index} value={subcategory.subCategoryName}>{subcategory.subCategoryName}</MenuItem>
+                                                    ))}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.metrics.map((metric, metricIndex) => (
+                                            <div key={metricIndex}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id={`metric-label-${rowIndex}-${metricIndex}`}>Metric</InputLabel>
+                                                    <Select
+                                                        labelId={`metric-label-${rowIndex}-${metricIndex}`}
+                                                        id={`metric-select-${rowIndex}-${metricIndex}`}
+                                                        value={metric.metric}
+                                                        onChange={(event) => handleMetricChange(event, rowIndex, metricIndex)}
                                                     >
-                                                        {renderSubcategoryOptions(index)}
+                                                        {selectedSubCategory && jsonData.processKpi.find(category => category.categoryName === selectedCategory)
+                                                            .subcategories.find(subcategory => subcategory.subCategoryName === row.subcategory)
+                                                            .queries.map((query, index) => (
+                                                                <MenuItem key={index} value={query.metric}>{query.metric}</MenuItem>
+                                                            ))}
                                                     </Select>
                                                 </FormControl>
-                                                {row.category && (
-                                                    <Tooltip title="Add Subcategory">
-                                                        <IconButton aria-label="add subcategory" onClick={() => handleAddSubcategory(subcategoryIndex)}>
-                                                            <AddIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
-
+                                                <IconButton aria-label="Add" onClick={() => handleAddMetric(rowIndex)}>
+                                                    <AddIcon />
+                                                </IconButton>
+                                                {row.metrics.length > 1 &&
+                                                    <IconButton aria-label="Remove" onClick={() => handleRemoveMetric(rowIndex, metricIndex)}>
+                                                        <RemoveIcon />
+                                                    </IconButton>
+                                                }
+                                                <TextField
+                                                    type="number"
+                                                    inputProps={{ min: 0, max: 10 }}
+                                                    value={metric.quantityTarget}
+                                                    onChange={(event) => handleQuantityTargetChange(event, rowIndex, metricIndex)}
+                                                />
                                             </div>
-                                        })
-                                    }
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
+                                        ))}
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton aria-label="Add" onClick={() => handleAddSubcategory(rowIndex)}>
+                                            <AddIcon />
+                                        </IconButton>
+                                        {rows.length > 1 &&
+                                            <IconButton aria-label="Remove" onClick={() => handleRemoveSubcategory(rowIndex)}>
+                                                <RemoveIcon />
+                                            </IconButton>
+                                        }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-                </Table>
-            </TableContainer>
-            <Button onClick={handlePost}>POST</Button>
+                <Button onClick={handleSave} variant="contained" color="primary" style={{ marginTop: '20px' }}>Post</Button>
+                </AccordionDetails>
+            </Accordion>
         </div>
     );
-}
+};
+
+export default MyTable;
