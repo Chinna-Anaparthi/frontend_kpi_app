@@ -16,6 +16,7 @@ export default function AddEmployeeKPI(props) {
   const [selectedMetric, setSelectedMetric] = useState('');
   const [quantityTarget, setQuantityTarget] = useState('');
   const [savedData, setSavedData] = useState([]);
+  const [subCategory, setSubcategory] = useState(null)
 
   const arrayData = props.metricsApiGet;
   console.log(arrayData, '5');
@@ -26,6 +27,7 @@ export default function AddEmployeeKPI(props) {
 
   const handleSubcategoryChange = (event, value) => {
     setSelectedSubcategory(value);
+   
   };
 
   const handleMetricChange = (event, value) => {
@@ -37,6 +39,17 @@ export default function AddEmployeeKPI(props) {
   };
 
   const handleSave = () => {
+
+
+    formattedData.processKpi.map((data)=>
+    {
+      if(data.subcategories.includes(selectedCategory)){
+        
+      }
+    })
+
+
+
     const formattedData = {
       role: "employee",
       processKpi: [
@@ -66,7 +79,7 @@ export default function AddEmployeeKPI(props) {
         quantityTarget: quantityTarget
       }
     ]);
-
+    console.log(savedData, '30');
     // Clear input fields
     setSelectedCategory('');
     setSelectedSubcategory('');
@@ -208,16 +221,22 @@ export default function AddEmployeeKPI(props) {
                 </TableRow>
               </TableBody>
             </Table>
+
+
+          </TableContainer>
+         
+         
+
+        </AccordionSummary>
+        <AccordionActions>
             <Button
               variant='outlined'
-              style={{ backgroundColor: '#e6f6fc', margin: '20px', marginRight: '0', flex:'end' }}
+              style={{ backgroundColor: '#e6f6fc'  }}
               onClick={handleSave}
             >
               Save
             </Button>
-
-          </TableContainer>
-        </AccordionSummary>
+          </AccordionActions>
       </Accordion>
       <TableContainer component={Paper} style={{ marginTop: '20px' }}>
         <Table>

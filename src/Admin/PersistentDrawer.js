@@ -513,11 +513,13 @@ export default function PersistentDrawerLeft() {
             {selectedRole === "Manager" && (
               <AddManagerKPI
                 managerKPI={managerKPI}
+                metricsApiGet = {metricsApiGet}
               />
             )}
             {selectedRole === "Director" && (
               <AddDirectorKPI
                 directorKPI={directorKPI}
+                metricsApiGet = {metricsApiGet}
               />
             )}
 
