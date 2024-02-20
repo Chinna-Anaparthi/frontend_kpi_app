@@ -10,19 +10,12 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
 
-export default function AddEmployeeKPI(props) {
+export default function EmployeeAdd(props) {
   const [processKpi, setProcessKpi] = useState([]);
   const [rows, setRows] = useState([{ category: '', subcategory: '', metrics: [{ metric: '', quantityTarget: '' }] }]);
 
   const addKPI = props.metricsApiGet;
-  const categoryArray = [];
 
-  addKPI.map((data) => {
-    categoryArray.push(data.category.map((da) => da));
-  });
-
-  console.log(categoryArray, "24");
-  JSON.stringify(categoryArray)
 
 
   useEffect(() => {
