@@ -1,0 +1,115 @@
+/* EmployeesideNav.css */
+
+.employee-container {
+  display: flex;
+}
+
+.sidebar {
+  height: 100%;
+  width: 180px;
+  background-color: #2b2b2b;
+  padding: 20px;
+  position: fixed;
+  top: 55px;
+  left: 0;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+
+}
+/* EmployeesideNav.css */
+
+.sidebar ul {
+  list-style: none; /* Remove the default list-style (bullets) */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+
+
+.main-content {
+  margin-left: 220px; /* Adjust margin to avoid overlapping with the sidebar */
+  padding: 20px; /* Add padding to the main content */
+}
+/* EmployeesideNav.css */
+
+.category-card {
+  margin-bottom: 20px;
+  padding: 40px; /* Increase padding */
+  border-radius: 10px; /* Increase border radius */
+  background-color: #eef1f3; /* Set background color */
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 23px;
+  cursor: pointer;
+  width: 65%;
+  margin-left: 150px;
+  margin-top: 30px;
+ 
+  
+}
+
+.subcategory-card {
+  margin-top: 10px;
+  list-style: none; 
+  font-size: 15px;
+  padding: 10px;
+  border-radius: 5px; /* Increase border radius */
+  background-color: #f9f9f9; /* Set background color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-content {
+  padding: 10px; /* Adjust padding */
+  list-style: none; /* Remove the default list-style (bullets) */
+
+}
+
+.card-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+/* EmployeesideNav.css */
+
+.subcategory-card ul {
+  list-style: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+.metric-card {
+  background-color: #eef1f3;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.metric-card h5{
+  margin-right: -60%;
+  margin-top: 5px;
+}
+
+.metric-card button
+{
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+.quantity-achieved-card {
+  background-color: #f9f9f9;
+  
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.view-details  {
+  background-color: #24a0ed;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 5px;
+  margin-right: -60%;
+  border-radius: 5px;
+
+}
+
+.view-details {
+  background-color: #5e98c7;
+}

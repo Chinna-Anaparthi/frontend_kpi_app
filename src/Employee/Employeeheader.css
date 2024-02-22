@@ -1,0 +1,19 @@
+/* Employeeheader.css */
+
+.header {
+    position: fixed; /* Fix the header position */
+    top: 0; /* Align the header to the top of the viewport */
+    width: 100%; /* Make the header span the full width of the viewport */
+    height: 55px;
+    background-color: #00aae7;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+  }
+  
+  .header h1 {
+    margin: 0;
+  }
+  

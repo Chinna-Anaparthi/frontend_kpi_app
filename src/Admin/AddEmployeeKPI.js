@@ -57,6 +57,8 @@ export default function AddEmployeeKPI(props) {
         },
       ],
     };
+
+
     setProcessKpi(jsonData.processKpi);
   }, []);
 
