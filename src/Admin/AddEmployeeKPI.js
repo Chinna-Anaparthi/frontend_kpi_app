@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, OutlinedInput, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, OutlinedInput, Button, Grid, Card, CardHeader, CardContent, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -16,7 +16,9 @@ export default function AddEmployeeKPI(props) {
   const [selectedMetric, setSelectedMetric] = useState('');
   const [quantityTarget, setQuantityTarget] = useState('');
   const [savedData, setSavedData] = useState([]);
-  const [subCategory, setSubcategory] = useState(null)
+
+
+  console.log(savedData.map((ele)=> ele.categoryName), '21');
 
   const arrayData = props.metricsApiGet;
   console.log(arrayData, '5');
@@ -27,7 +29,7 @@ export default function AddEmployeeKPI(props) {
 
   const handleSubcategoryChange = (event, value) => {
     setSelectedSubcategory(value);
-   
+
   };
 
   const handleMetricChange = (event, value) => {
@@ -39,17 +41,6 @@ export default function AddEmployeeKPI(props) {
   };
 
   const handleSave = () => {
-
-
-    formattedData.processKpi.map((data)=>
-    {
-      if(data.subcategories.includes(selectedCategory)){
-        
-      }
-    })
-
-
-
     const formattedData = {
       role: "employee",
       processKpi: [
@@ -70,16 +61,8 @@ export default function AddEmployeeKPI(props) {
       ]
     };
 
-    setSavedData([
-      ...savedData,
-      {
-        categoryName: selectedCategory,
-        subCategoryName: selectedSubcategory,
-        metric: selectedMetric,
-        quantityTarget: quantityTarget
-      }
-    ]);
-    console.log(savedData, '30');
+
+
     // Clear input fields
     setSelectedCategory('');
     setSelectedSubcategory('');
@@ -109,6 +92,29 @@ export default function AddEmployeeKPI(props) {
       });
   };
 
+  useEffect(() => {
+    fetch('http://172.17.15.150:8080/api/getMetrics/employee')
+      .then((response) => response.json())
+      .then((response) => {
+        const data = response
+        const categoryDetails = data.response.map(item => {
+          const categoryName = item.processKpi[0].categoryName;
+          const subCategoryName = item.processKpi[0].subcategories[0].subCategoryName;
+          const metric = item.processKpi[0].subcategories[0].queries[0].metric;
+          const quantityTarget = item.processKpi[0].subcategories[0].queries[0].quantityTarget;
+      
+          return { categoryName, subCategoryName, metric, quantityTarget };
+        });
+        // console.log(categoryDetails.map((ele)=> ele.categoryName),'109');
+
+        setSavedData(categoryDetails);
+
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      })
+  }, [])
+
 
 
   return (
@@ -121,7 +127,7 @@ export default function AddEmployeeKPI(props) {
         >
           <b>Employee KPI</b>
         </AccordionSummary>
-        <AccordionSummary>
+        <AccordionDetails>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -224,42 +230,44 @@ export default function AddEmployeeKPI(props) {
 
 
           </TableContainer>
-         
-         
 
-        </AccordionSummary>
+
+
+        </AccordionDetails>
         <AccordionActions>
-            <Button
-              variant='outlined'
-              style={{ backgroundColor: '#e6f6fc'  }}
-              onClick={handleSave}
-            >
-              Save
-            </Button>
-          </AccordionActions>
+          <Button
+            variant='outlined'
+            style={{ backgroundColor: '#e6f6fc' }}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        </AccordionActions>
       </Accordion>
-      <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Category</TableCell>
-              <TableCell>Subcategory</TableCell>
-              <TableCell>Metrics</TableCell>
-              <TableCell>Quantity Target</TableCell>
+
+     <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Category</TableCell>
+            <TableCell>subCategory</TableCell>
+            <TableCell>Metrics</TableCell>
+            <TableCell>Quantity Target</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {savedData.map((data, index)=>(
+            <TableRow key={index}>
+              <TableCell>{data.categoryName}</TableCell>
+              <TableCell>{data.subCategoryName}</TableCell>
+              <TableCell>{data.metric}</TableCell>
+              <TableCell>{data.quantityTarget}</TableCell>
+              {/* <TableRow>{data.categoryName}</TableRow> */}
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {savedData.map((data, index) => (
-              <TableRow key={index}>
-                <TableCell>{data.categoryName}</TableCell>
-                <TableCell>{data.subCategoryName}</TableCell>
-                <TableCell>{data.metric}</TableCell>
-                <TableCell>{data.quantityTarget}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          ))}
+        </TableBody>
+      </Table>
+     </TableContainer>
     </div>
   );
 }

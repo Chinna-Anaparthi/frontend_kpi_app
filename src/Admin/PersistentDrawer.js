@@ -19,6 +19,7 @@ import AddManagerKPI from './AddManagerKPI';
 import AddDirectorKPI from './AddDirectorKPI';
 import { Alert, Button, Snackbar, } from '@mui/material';
 import ChipInput from 'material-ui-chip-input';
+import Manager from '../ManagerPortal/Manager';
 import { makeStyles } from '@mui/styles';
 import {
   Table,
@@ -503,7 +504,7 @@ export default function PersistentDrawerLeft() {
 
               </TableContainer>
             )}
-            {/* Conditionally render selected role component */}
+           
             {selectedRole === "Employee" && (
               <AddEmployeeKPI
                 employeeKPI={employeeKPI}
@@ -522,7 +523,8 @@ export default function PersistentDrawerLeft() {
                 metricsApiGet = {metricsApiGet}
               />
             )}
-
+<Manager 
+/>
           </div>
         </Main>
       </Box>
