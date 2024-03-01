@@ -13,6 +13,8 @@ import AddDirectorKPI from './Admin/AddDirectorKPI.js';
 import PersistentDrawerLeft from './Admin/PersistentDrawer.js';
 import EmployeeAdd from './Admin/EmployeeAdd.js';
 import Sample from './Employee/EmployeecardsData.js'
+import EmployeeData from './Employee/EmployeeData.js';
+import Quarters from './Employee/Quarters.js';
 
 
 
@@ -31,6 +33,8 @@ function App() {
           <Route path='/employee' element={<Employee />} />
           <Route path='/drawer' element={<PersistentDrawerLeft />} />
           <Route path='/Sample' element={<Sample />} />
+          <Route path='/employ' element={<EmployeeData />} />
+          <Route path='/quarter' element={<Quarters />} />
           
           <Route path='/emp' element={<EmployeeAdd />} />
           <Route path='*' element={<NotFound />} />
