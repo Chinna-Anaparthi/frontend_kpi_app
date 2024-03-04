@@ -25,6 +25,10 @@ export default function AddManagerKPI(props) {
   const [savedData, setSavedData] = useState([]);
   const [page, setPage] = useState(0);
   const [processKpi, setProcessKpi] = useState([]);
+  
+
+  const [cField, setCField]= useState([])
+  const [scField, setSCField]= useState([])
 
   const arrayData = props.metricsApiGet;
   console.log(arrayData, '5');
@@ -42,23 +46,34 @@ export default function AddManagerKPI(props) {
 
 
   const handleCategoryChange = (event, value, index) => {
+    let updatedCategoryArray = [...scField];
     setSelectedCategoryIndex(index);
-    setCategorySelections(prevState => ({ ...prevState, [index]: value }));
+   let category= {
+    categoryName:value,
+    subCategory:[] 
+   }
+   updatedCategoryArray.push(category);
+setCField(updatedCategoryArray)
+  
   };
 
-  // const handleSubcategoryChange = (event, value, categoryIndex, subcategoryIndex) => {
-  //   setSelectedSubcategoryIndex(subcategoryIndex);
-  //   setSubcategorySelections(prevState => ({ ...prevState, [`${categoryIndex}-${subcategoryIndex}`]: value }));
-  // };
   const handleSubcategoryChange = (event, value, categoryIndex, subcategoryIndex) => {
     setSelectedSubcategoryIndex(subcategoryIndex);
-    setSubcategorySelections(prevState => ({
-      ...prevState,
-      [categoryIndex]: value // Store selected subcategory value with respect to its category index
-    }));
+    let updatedSubCategoryArray = [...scField];
+   let subCategory= {
+    subCategoryName:value,
+    queries:[] 
+   }
+   updatedSubCategoryArray.push(subCategory);
+  
+    setSCField(updatedSubCategoryArray)
+    console.log(scField,"70");
+   cField.subCategory =scField
+ 
+   
   };
 
-
+console.log(cField,"77");
 
   const handleMetricChange = (event, value, categoryIndex, subcategoryIndex) => {
     setMetricSelections(prevState => ({
@@ -115,6 +130,12 @@ export default function AddManagerKPI(props) {
 
   const handleSave = () => {
     console.log(processKpi, "117");
+
+    console.log({
+      category: categorySelections,
+      subCategory: subcategorySelections,
+      metric: metricSelections
+    },"123");
     const formattedData = {
       role: "manager",
       processKpi: processKpi.map((category, categoryIndex) => ({
@@ -170,6 +191,7 @@ export default function AddManagerKPI(props) {
         }
       ];
     });
+    console.log(categorySelections,"179");
   };
 
   const removeCategory = (index) => {
