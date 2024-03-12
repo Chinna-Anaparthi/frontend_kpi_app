@@ -9,19 +9,20 @@ import NotFound from './NotFound';
 import Employee from './Employee/Employee.js';
 import AddEmployeeKPI from './Admin/AddEmployeeKPI.js';
 import AddManagerKPI from './Admin/AddManagerKPI.js';
-import AddDirectorKPI from './Admin/AddDirectorKPI.js';
-import PersistentDrawerLeft from './Admin/PersistentDrawer.js';
+import AddDirectorKPI from './Admin/AddDirectorKPI.js'
 import EmployeeAdd from './Admin/EmployeeAdd.js';
-import Manager from './ManagerPortal/Manager.js';
-import RootPage from './ManagerPortal/RootPage.js';
-import { PrimeReactProvider } from 'primereact/api';
+import Sample from './Employee/EmployeecardsData.js'
+import EmployeeData from './Employee/EmployeeData.js';
+import Quarters from './Employee/Quarters.js';
+import AdminKPIMetrics from './Admin/AdminKPIMetrics.js';
 
 
 
 function App() {
+  
   return (
     <div className="App">
-       <PrimeReactProvider>
+       
       <Router>
         <Routes>
           <Route path='/login' element={<Login />} />
@@ -32,14 +33,16 @@ function App() {
           <Route path='/addDirector' element={<AddDirectorKPI />} />
           <Route path='/forgotPwd' element={<ForgotPassword />} />
           <Route path='/employee' element={<Employee />} />
-          <Route path='/drawer' element={<PersistentDrawerLeft />} />
-          <Route path='/root' element={<RootPage />} />
-          <Route path='/manager' element={<Manager />} />
+          <Route path='/adminMetrics' element={<AdminKPIMetrics />} />
+          <Route path='/Sample' element={<Sample />} />
+          <Route path='/employ' element={<EmployeeData />} />
+          <Route path='/quarter' element={<Quarters />} />
+          
           <Route path='/emp' element={<EmployeeAdd />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </Router>
-      </PrimeReactProvider>
+     
     </div>
   );
 }

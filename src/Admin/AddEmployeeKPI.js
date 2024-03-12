@@ -70,8 +70,8 @@ export default function AddEmployeeKPI(props) {
     setQuantityTarget('');
 
     console.log('Formatted Data:', formattedData);
-
-    fetch('http://172.17.15.150:8080/api/addMetrics', {
+    // Example POST request using fetch
+    fetch('http://172.17.15.253:8080/api/addMetrics', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

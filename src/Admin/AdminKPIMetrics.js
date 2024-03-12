@@ -13,7 +13,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
-import ServiceHelper from '../ServiceHelper/ServiceHelper';
 import AddEmployeeKPI from './AddEmployeeKPI';
 import AddManagerKPI from './AddManagerKPI';
 import AddDirectorKPI from './AddDirectorKPI';
@@ -79,14 +78,14 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 
-export default function PersistentDrawerLeft() {
+export default function AdminKPIMetrics() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [metricsID, setMetricsID] = useState(null)
   const [method, setMethod] = useState();
   const [apiGet, setApiGet] = useState();
   const [employeeKPI, setEmployeeKPI] = useState();
-  const [managerKPI, setManagerKPI] = useState();
+  const [managerKPI, setManagerKPI] = useState([]);
   const [directorKPI, setDirectorKPI] = useState();
   const [selectedRole, setSelectedRole] = useState(null);
   const [category, setCategory] = useState()
@@ -100,6 +99,8 @@ export default function PersistentDrawerLeft() {
   const [isSaveDisable, setIsSaveDisable] = useState(false);
 
   const roles = ["KPI Metrics", "Employee", "Manager", "Director"];
+
+  console.log(metricsApiGet, '103');
 
   const handleClick = () => {
     setOpenSnack(true);
@@ -115,42 +116,64 @@ export default function PersistentDrawerLeft() {
     setOpenSnack(false);
   };
 
-
   useEffect(() => {
-    fetch('http://172.17.15.150:8080/api/getMetrics')
+    callKPIMetrics()
+
+  }, [])
+  const callKPIMetrics = () => {
+    // fetch('http://172.17.15.253:4000/api/getMetrics')
+    // .then((response) => response.json())
+    // .then((data) => {
+    //   console.log(data, '91');
+    //   setApiGet(data.response)
+    // })
+    // .catch((error) => {
+    //   console.error('Error fetching data:', error);
+    // })
+    setSelectedRole('KPI Metrics')
+    fetch('http://172.17.15.253:4000/api/getCategoryQuestions')
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data, '91');
-        setApiGet(data.response)
+      .then((response) => {
+
+        setMetricsID(response.data[0]._id)
+        setMetricsApiGet(response.data);
+
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       })
-  }, [])
-
+  }
 
   useEffect(() => {
     setMethod('get');
   }, []);
 
-  useEffect(() => {
-    if (apiGet !== undefined) {
-      apiGet.forEach(element => {
-        if (element.role === 'employee') {
-          console.log(element, "12");
-          setEmployeeKPI(element)
-        }
-        if (element.role === 'manager') {
-          console.log(element, "12");
-          setManagerKPI(element)
-        }
-        if (element.role === 'director') {
-          console.log(element, "12");
-          setDirectorKPI(element)
-        }
-      });
+
+
+
+
+  // For Manager API ROLE
+  const handleSelectedRole = (mrole) => {
+    if (mrole === 'Manager') {
+      setSelectedRole('Manager')
+      fetch('http://172.17.15.253:4000/api/getMetrics/manager')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.response, '91');
+          setManagerKPI(data.response)
+          // setApiGet(data.response)
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        })
     }
-  }, [apiGet])
+    console.log(mrole, "160");
+    if (mrole === 'KPI Metrics') {
+      callKPIMetrics()
+      setSelectedRole('KPI Metrics')
+    }
+  }
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -177,6 +200,7 @@ export default function PersistentDrawerLeft() {
   };
 
   const handleSave = (value1, value2, value3) => {
+    console.log("IN KPI 182");
     if (metricsID !== null && metricsID) {
       metricsApiGet.forEach((element) => {
         if (value1.length !== 0) {
@@ -206,7 +230,7 @@ export default function PersistentDrawerLeft() {
       })
       console.log(metricsApiGet, "203");
       //  console.log(...metricsApiGet, reqBody, '177');
-      fetch('http://172.17.15.150:8080/api/addCategoryQuestions/' + metricsID, {
+      fetch('http://172.17.15.253:4000/api/addCategoryQuestions/' + metricsID, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -232,7 +256,7 @@ export default function PersistentDrawerLeft() {
         subCategory: value2,
         metrics: value3
       };
-      fetch('http://172.17.15.150:8080/api/addCategoryQuestions', {
+      fetch('http://172.17.15.253:4000/api/addCategoryQuestions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -275,19 +299,6 @@ export default function PersistentDrawerLeft() {
   };
 
 
-  useEffect(() => {
-    fetch('http://172.17.15.150:8080/api/addCategoryQuestions')
-      .then((response) => response.json())
-      .then((response) => {
-
-        setMetricsID(response.data[0]._id)
-        setMetricsApiGet(response.data);
-
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      })
-  }, [])
 
   console.log(metricsApiGet, "283");
   // console.log(metricsApiPost, "188", method);
@@ -374,7 +385,7 @@ export default function PersistentDrawerLeft() {
                   backgroundColor: selectedRole === role ? '#f0f0f0' : 'inherit',
                   color: selectedRole === role ? 'black' : 'inherit',
                 }}
-                onClick={() => setSelectedRole(role)}
+                onClick={() => handleSelectedRole(role)}
               >
                 <ListItem key={role} disablePadding>
                   {role}
@@ -438,7 +449,7 @@ export default function PersistentDrawerLeft() {
                     handleSave(category, subCategory, metrics);
                     handleClick();
                   }}
-                  disabled = {!isSaveDisable}
+                  disabled={!isSaveDisable}
                 >
                   Save
                 </Button>
@@ -472,59 +483,61 @@ export default function PersistentDrawerLeft() {
                   </TableHead>
                   <TableBody>
                     {metricsApiGet.map((row, index) => (
-                      <TableRow key={index}>
+                      <React.Fragment key={index}>
                         {/* Render category data */}
-                        <TableCell>
-                          {row.category.map((categoryItem, categoryIndex) => (
-                            <TableRow key={`category-${index}-${categoryIndex}`}>
-                              <TableCell>{categoryItem}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableCell>
+                        {row.category.map((categoryItem, categoryIndex) => (
+                          <TableRow key={`category-${index}-${categoryIndex}`}>
+                            <TableCell>{categoryItem}</TableCell>
+                            <TableCell></TableCell> {/* Empty TableCell for subCategory */}
+                            <TableCell></TableCell> {/* Empty TableCell for metrics */}
+                          </TableRow>
+                        ))}
                         {/* Render subCategory data */}
-                        <TableCell>
-                          {row.subCategory.map((subCategoryItem, subCategoryIndex) => (
-                            <TableRow key={`subCategory-${index}-${subCategoryIndex}`}>
-                              <TableCell>{subCategoryItem}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableCell>
+                        {row.subCategory.map((subCategoryItem, subCategoryIndex) => (
+                          <TableRow key={`subCategory-${index}-${subCategoryIndex}`}>
+                            <TableCell></TableCell> {/* Empty TableCell for category */}
+                            <TableCell>{subCategoryItem}</TableCell>
+                            <TableCell></TableCell> {/* Empty TableCell for metrics */}
+                          </TableRow>
+                        ))}
                         {/* Render metrics data */}
-                        <TableCell>
-                          {row.metrics.map((metricsItem, metricsIndex) => (
-                            <TableRow key={`metrics-${index}-${metricsIndex}`}>
-                              <TableCell>{metricsItem}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableCell>
-                      </TableRow>
+                        {row.metrics.map((metricsItem, metricsIndex) => (
+                          <TableRow key={`metrics-${index}-${metricsIndex}`}>
+                            <TableCell></TableCell> {/* Empty TableCell for category */}
+                            <TableCell></TableCell> {/* Empty TableCell for subCategory */}
+                            <TableCell>{metricsItem}</TableCell>
+                          </TableRow>
+                        ))}
+                      </React.Fragment>
                     ))}
                   </TableBody>
+
+
                 </Table>
 
               </TableContainer>
             )}
-           
+
             {selectedRole === "Employee" && (
               <AddEmployeeKPI
                 employeeKPI={employeeKPI}
-                metricsApiGet = {metricsApiGet}
+                metricsApiGet={metricsApiGet}
               />
             )}
             {selectedRole === "Manager" && (
               <AddManagerKPI
                 managerKPI={managerKPI}
-                metricsApiGet = {metricsApiGet}
+                metricsApiGet={metricsApiGet}
               />
             )}
             {selectedRole === "Director" && (
               <AddDirectorKPI
                 directorKPI={directorKPI}
-                metricsApiGet = {metricsApiGet}
+                metricsApiGet={metricsApiGet}
               />
             )}
-<Manager 
-/>
+            {/* <Manager 
+/> */}
           </div>
         </Main>
       </Box>
