@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, OutlinedInput, Button } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  OutlinedInput,
+  Button,
+  Card,
+  Tab,
+} from "@mui/material";
 import { Pagination } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
@@ -11,6 +23,10 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveAsIcon from '@mui/icons-material/SaveAs';
+import { Tabs } from "@mui/base";
+import './AddManagerKPI.css'
 
 export default function AddManagerKPI(props) {
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -20,15 +36,16 @@ export default function AddManagerKPI(props) {
   const [categorySelections, setCategorySelections] = useState({});
   const [subcategorySelections, setSubcategorySelections] = useState({});
   const [metricSelections, setMetricSelections] = useState({});
+  const [subCategory, setSubCategory] = useState({ queries: [] });
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(null);
   const [selectedSubcategoryIndex, setSelectedSubcategoryIndex] = useState(null);
   const [savedData, setSavedData] = useState([]);
   const [page, setPage] = useState(0);
   const [processKpi, setProcessKpi] = useState([]);
-  
+  const [cField, setCField] = useState([])
+  const [scField, setSCField] = useState([])
+  const [editModes, setEditModes] = useState([]);
 
-  const [cField, setCField]= useState([])
-  const [scField, setSCField]= useState([])
 
   const arrayData = props.metricsApiGet;
   console.log(arrayData, '5');
@@ -44,36 +61,46 @@ export default function AddManagerKPI(props) {
   };
 
 
+  const toggleCategory = (categoryName) => {
+    setSelectedCategory(selectedCategory === categoryName ? null : categoryName);
+    setSelectedSubcategoryIndex(null);
+  };
+
+
+  const toggleSubcategory = (subcategoryName) => {
+    setSelectedSubcategory(selectedSubcategory === subcategoryName ? null : subcategoryName);
+  };
+
 
   const handleCategoryChange = (event, value, index) => {
     let updatedCategoryArray = [...scField];
     setSelectedCategoryIndex(index);
-   let category= {
-    categoryName:value,
-    subCategory:[] 
-   }
-   updatedCategoryArray.push(category);
-setCField(updatedCategoryArray)
-  
+    let category = {
+      categoryName: value,
+      subCategory: []
+    }
+    updatedCategoryArray.push(category);
+    setCField(updatedCategoryArray)
+
   };
 
   const handleSubcategoryChange = (event, value, categoryIndex, subcategoryIndex) => {
     setSelectedSubcategoryIndex(subcategoryIndex);
     let updatedSubCategoryArray = [...scField];
-   let subCategory= {
-    subCategoryName:value,
-    queries:[] 
-   }
-   updatedSubCategoryArray.push(subCategory);
-  
+    let subCategory = {
+      subCategoryName: value,
+      queries: []
+    }
+    updatedSubCategoryArray.push(subCategory);
+
     setSCField(updatedSubCategoryArray)
-    console.log(scField,"70");
-   cField.subCategory =scField
- 
-   
+    console.log(scField, "70");
+    cField.subCategory = scField
+
+
   };
 
-console.log(cField,"77");
+  console.log(cField, "77");
 
   const handleMetricChange = (event, value, categoryIndex, subcategoryIndex) => {
     setMetricSelections(prevState => ({
@@ -128,57 +155,87 @@ console.log(cField,"77");
   }, []);
 
 
-  const handleSave = () => {
-    console.log(processKpi, "117");
+  // const handleSave = () => {
+  //   console.log(processKpi, "117");
 
-    console.log({
-      category: categorySelections,
-      subCategory: subcategorySelections,
-      metric: metricSelections
-    },"123");
-    const formattedData = {
+  //   console.log({
+  //     category: categorySelections,
+  //     subCategory: subcategorySelections,
+  //     metric: metricSelections
+  //   }, "123");
+  //   const formattedData = {
+  //     role: "manager",
+  //     processKpi: processKpi.map((category, categoryIndex) => ({
+  //       categoryName: categorySelections[categoryIndex] || '',
+  //       subcategories: category.subcategories.map((subcategory, subcategoryIndex) => ({
+  //         subCategoryName: subcategorySelections[categoryIndex] || '',
+  //         queries: subcategory.queries.map((query, queryIndex) => ({
+  //           metric: metricSelections[`${categoryIndex}-${subcategoryIndex}`] || '',
+  //           quantityTarget: query.quantityTarget // Use the quantityTarget from the query
+  //         }))
+  //       }))
+  //     }))
+  //   };
+
+  //   // Clear input fields
+  //   setCategorySelections({});
+  //   setSubcategorySelections({});
+  //   setMetricSelections({});
+  //   setQuantityTarget('');
+
+  //   console.log('Formatted Data:', formattedData);
+
+
+  // };
+
+
+  //API CALL TO SAVE THE DATA
+  const handleSave = () => {
+    console.log(cField, "148");
+    let formattedData = {
       role: "manager",
-      processKpi: processKpi.map((category, categoryIndex) => ({
-        categoryName: categorySelections[categoryIndex] || '',
-        subcategories: category.subcategories.map((subcategory, subcategoryIndex) => ({
-          subCategoryName: subcategorySelections[categoryIndex] || '',
-          queries: subcategory.queries.map((query, queryIndex) => ({
-            metric: metricSelections[`${categoryIndex}-${subcategoryIndex}`] || '',
-            quantityTarget: query.quantityTarget // Use the quantityTarget from the query
-          }))
-        }))
-      }))
+      processKpi: cField,
     };
-  
-    // Clear input fields
-    setCategorySelections({});
-    setSubcategorySelections({});
-    setMetricSelections({});
-    setQuantityTarget('');
-  
-    console.log('Formatted Data:', formattedData);
-  
-    // fetch('http://172.17.15.150:8080/api/addMetrics', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(formattedData),
-    // })
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error('Failed to post data');
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     console.log('Data posted successfully:', data);
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error posting data:', error);
-    //   });
+    console.log(formattedData, "145");
+    fetch("http://172.17.15.253:4000/api/addMetrics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formattedData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to post data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data posted successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error posting data:", error);
+      });
+
   };
-  
+
+  useEffect(() => {
+    const handleGetData = () => {
+      fetch('http://172.17.15.253:4000/api/getMetrics/manager')
+        .then((response) => response.json())
+        .then((response) => {
+          const data = response.response.map((ele) => ele.processKpi)
+          var data1 = data.map((ele) => ele)
+          setSavedData(data1[0])
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        })
+    }
+    handleGetData()
+  }, []);
+
+
 
 
   const addCategory = () => {
@@ -191,7 +248,7 @@ console.log(cField,"77");
         }
       ];
     });
-    console.log(categorySelections,"179");
+    console.log(categorySelections, "179");
   };
 
   const removeCategory = (index) => {
@@ -402,6 +459,52 @@ console.log(cField,"77");
     ));
   };
 
+  const handleEditClick = (index) => {
+    const newEditModes = [...editModes];
+    newEditModes[index] = !editModes[index];
+    setEditModes(newEditModes);
+    console.log(editModes, '610', savedData);
+  };
+
+  const handleDeleteMetric = async (index, categoryName, subCategoryName, metric) => {
+    try {
+      // Make DELETE request to remove the metric
+      const response = await fetch(`http://172.17.15.253:4000/api/removeMetrics/manager/${categoryName}/${subCategoryName}/${metric}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete metric');
+      }
+
+      // Remove the metric from the state
+      const updatedQueries = [...subCategory.queries];
+      updatedQueries.splice(index, 1);
+      setSubCategory((prevSubCategory) => ({
+        ...prevSubCategory,
+        queries: updatedQueries,
+      }));
+    } catch (error) {
+      console.error('Error deleting metric:', error.message);
+    }
+  };
+
+
+  const handleManagerMetricChange = (value, categoryIndex, subcategoryIndex, queryIndex) => {
+    const updatedData = [...savedData];
+    updatedData[categoryIndex].subCategory[subcategoryIndex].queries[queryIndex].metric = value;
+    setSavedData(updatedData);
+  };
+
+  const handleManagerQuantityTargetChange = (value, categoryIndex, subcategoryIndex, queryIndex) => {
+    const updatedData = [...savedData];
+    updatedData[categoryIndex].subCategory[subcategoryIndex].queries[queryIndex].quantityTarget = value;
+    setSavedData(updatedData);
+  };
+
   return (
 
     <div style={{ backgroundColor: "transparent" }}>
@@ -442,36 +545,118 @@ console.log(cField,"77");
           </Button>
         </AccordionActions>
       </Accordion>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Category</TableCell>
-              <TableCell>subCategory</TableCell>
-              <TableCell>Metrics</TableCell>
-              <TableCell>Quantity Target</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((data, index) => (
-              <TableRow key={index}>
-                <TableCell>{data.categoryName}</TableCell>
-                <TableCell>{data.subCategoryName}</TableCell>
-                <TableCell>{data.metric}</TableCell>
-                <TableCell>{data.quantityTarget}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <p>Please go through the below cards if you want to see or update data.</p>
+      <div style={{ marginTop: '20px' }}>
+        {savedData.map((category, categoryIndex) => (
+          console.log(savedData, '701'),
+          <div key={categoryIndex}>
+            <Card onClick={() => toggleCategory(category.categoryName)} style={{ backgroundColor: categoryIndex % 2 === 0 ? '#f9f9f9' : '#daeef5', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', }}>
+                <div>
+                  <p style={{ fontSize: '16px', textAlign: 'left', marginLeft: '20px', fontFamily: 'roboto', }}>
+                    <b style={{ cursor: 'pointer' }}>{category.categoryName}</b>
+                  </p>
+                </div>
+                <div style={{ display: 'flex', }}>
+                  <Button><DeleteIcon /></Button>
+                </div>
+              </div>
+            </Card>
+            {selectedCategory === category.categoryName && (
+              <div>
+                <Tabs value={selectedSubcategory}>
+                  {category.subCategory.map((subcategories, subcategoryIndex) => (
+                    <Tab
+
+                      key={subcategoryIndex}
+                      label={subcategories.subCategoryName}
+                      value={subcategories.subCategoryName}
+                      onClick={() => toggleSubcategory(subcategories.subCategoryName)}
+                      style={{
+                        color: selectedSubcategory === subcategories.subCategoryName ? '#1976d2' : 'black', // Change the color based on selection
+                        fontWeight: selectedSubcategory === subcategories.subCategoryName ? 'bold' : 'normal', // Apply bold font weight to the selected tab
+                      }}
+                    />
+                  ))}
+                  <Button><DeleteIcon /></Button>
+                </Tabs>
+                <div style={{ display: 'flex', }}>
+                  {category.subCategory.map((subCategory, subcategoryIndex) => (
+                    <div key={subcategoryIndex}>
+                      {selectedSubcategory === subCategory.subCategoryName && (
+                        <div>
+                          {subCategory.queries.map((query, queryIndex) => (
+                            <Card
+                              key={queryIndex}
+                              style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', width: '100vh' }}
+                            >
+                              <div>
+                                <TableContainer component={Paper}>
+                                  <Table style={{ width: '30vw', borderCollapse: 'collapse' }}>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell> <b>Metric:</b></TableCell>
+                                        <TableCell> <b>Quantity Target:</b></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      <TableRow>
+                                        <TableCell>
+                                          {editModes[queryIndex] ? (
+                                            <TextField
+                                              value={query.metric}
+                                              onChange={(e) => handleManagerMetricChange(e.target.value, categoryIndex, subcategoryIndex, queryIndex)}
+                                            />
+                                          ) : (
+                                            query.metric
+                                          )}
+                                        </TableCell>
+                                        <TableCell>
+                                          {editModes[queryIndex] ? (
+                                            <TextField
+                                              value={query.quantityTarget}
+                                              onChange={(e) => handleManagerQuantityTargetChange(e.target.value, categoryIndex, subcategoryIndex, queryIndex)}
+                                            />
+                                          ) : (
+                                            query.quantityTarget
+                                          )}
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              </div>
+
+                              <div>
+                                <Button onClick={() => handleEditClick(queryIndex)}>
+                                  {editModes[queryIndex] ? <SaveAsIcon /> : <EditIcon />}
+                                </Button>
+                                <Button onClick={() => handleDeleteMetric(queryIndex, category.categoryName, subCategory.subCategoryName, query.metric)}>
+                                  <DeleteIcon />
+                                </Button>
+
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Pagination */}
-      <Pagination
+      {/* <Pagination
         count={Math.ceil(savedData.length / itemsPerPage)}
         page={page}
         onChange={handleChangePage}
         style={{ marginTop: '20px', justifyContent: 'center' }}
-      />
+      /> */}
     </div>
   );
 }
