@@ -4,29 +4,37 @@ import { AppBar, Card, CardContent, Grid, Toolbar, Typography, Button, TableCont
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import { blue, blueGrey, deepOrange, deepPurple, lightBlue } from '@mui/material/colors';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import EmployeeHeader from './Employeeheader'
 
 export default function EmployeeData() {
     const [employeeData, setEmployeeData] = useState('');
     const [expandedQuarter, setExpandedQuarter] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedQuery, setSelectedQuery] = useState(null); // State to store the selected query
     const [showPopup, setShowPopup] = useState(false); // State to track whether to show the popup form
-    const [addEmployeeMetrics, setAddEmployeeMetrics] = useState( {
-        'quarter':'',
-        'category':'',
-        'subCategory':'',
-        'metric':'',
-        'quantityTarget':'',
-        'quantityAchieved':'',
-        'eIndex':'',
-        'empComments':'',
+    const [addEmployeeMetrics, setAddEmployeeMetrics] = useState({
+        'quantityAchieved': '',
+        'eIndex': '',
+        'empComments': '',
+        'employeeFlag': false,
+        'managerFlag': false,
+        'directorFlag': false
     })
-    
-    
+
+    console.log(addEmployeeMetrics, 'addEmployeeMetrics');
+
+
     const [openDialog, setOpenDialog] = useState(false);
+    const [employFlag, setEmployFlag] = useState(false);
+    const [quarterEmpData, setQuarterEmpData] = useState(null);
+    console.log(employeeData, '36');
 
     const kpiQuarter = ["Quarter1", "Quarter2", "Quarter3", "Quarter4"]
     console.log(selectedSubcategory, '21');
@@ -35,8 +43,9 @@ export default function EmployeeData() {
         // Fetch employee data from the API
         const fetchEmployeeData = async () => {
             try {
-                const response = await axios.get('http://172.17.15.150:4000/api/getMetrics/director');
+                const response = await axios.get('http://172.17.15.253:4000/api/getMetrics/manager');
                 setEmployeeData(response.data.response[0]);
+                localStorage.setItem('employeeKPI', JSON.stringify(response.data.response[0]));
                 console.log(response.data.response, '25');
 
             } catch (error) {
@@ -47,7 +56,7 @@ export default function EmployeeData() {
         fetchEmployeeData();
     }, []);
 
-    console.log(selectedQuery, '32');
+    console.log(selectedQuery, '54');
 
 
     const toggleQuarter = (index) => {
@@ -72,86 +81,244 @@ export default function EmployeeData() {
 
     };
 
-
-    // Function to handle when "View Details" is clicked
     const toggleQuery = (query) => {
+        console.log('Toggling query:', query);
         setSelectedQuery(selectedQuery === query ? null : query);
         setOpenDialog(true);
+    };
+
+    const handleOpenDialog = (data) => {
+        saveKPIData(data);
+        console.log(saveKPIData(data), '89');
+        setDialogOpen(true);
+    };
+
+    const handleCloseViewDialog = () => {
+        setDialogOpen(false);
     };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
 
-    const handleInputChange = (e, queryIndex, fieldName) => {
-        const { value } = e.target;
-    
-        // Ensure employeeData and processKpi exist and selectedCategory is a valid index
-        if (!employeeData || !employeeData.processKpi || !employeeData.processKpi[selectedCategory]) {
-            console.error('Invalid employee data or selected category.');
-            return;
-        }
-    
-        const updatedQueries = [...employeeData.processKpi[selectedCategory].subcategories[selectedSubcategory].queries];
-        updatedQueries[queryIndex][fieldName] = value;
-    
-        const updatedEmployeeData = {
-            ...employeeData,
-            processKpi: employeeData.processKpi.map((category, categoryIndex) => {
-                if (categoryIndex === selectedCategory) {
-                    return {
-                        ...category,
-                        subcategories: category.subcategories.map((subcategory, subcategoryIndex) => {
-                            if (subcategoryIndex === selectedSubcategory) {
-                                return {
-                                    ...subcategory,
-                                    queries: updatedQueries,
-                                };
-                            }
-                            return subcategory;
-                        }),
-                    };
-                }
-                return category;
-            }),
-        };
-        setEmployeeData(updatedEmployeeData);
-    };
-    
+    // const handleInputChange = (e, queryIndex, fieldName) => {
+    //     const { value } = e.target;
 
-    const handleSave = async () => {
+
+
+    //     const updatedQueries = [...employeeData.processKpi[selectedCategory].subcategories[selectedSubcategory].queries];
+    //     updatedQueries[queryIndex][fieldName] = value;
+
+    //     const updatedEmployeeData = {
+    //         ...employeeData,
+    //         processKpi: employeeData.processKpi.map((category, categoryIndex) => {
+    //             if (categoryIndex === selectedCategory) {
+    //                 return {
+    //                     ...category,
+    //                     subcategories: category.subcategories.map((subcategory, subcategoryIndex) => {
+    //                         if (subcategoryIndex === selectedSubcategory) {
+    //                             return {
+    //                                 ...subcategory,
+    //                                 queries: updatedQueries,
+    //                             };
+    //                         }
+    //                         return subcategory;
+    //                     }),
+    //                 };
+    //             }
+    //             return category;
+    //         }),
+    //     };
+    //     setEmployeeData(updatedEmployeeData);
+    // };
+    var storedValue = localStorage.getItem('employeeFlag');
+
+
+    const handleSectionSave = () => {
         try {
-            // Make sure editedQueries contains data
-            if (employeeData.length === 0) return;
+            const { metric, quantityTarget } = selectedQuery || {};
 
-            // Post the edited queries to your API endpoint
-            const response = await axios.post('http://172.17.15.150:4000/api/registerEmployee', {
-                employeeData,
+            // Update the addEmployeeMetrics state with the extracted values
+            setAddEmployeeMetrics({
+                ...addEmployeeMetrics,
+                metric: metric || '',
+                quantityTarget: quantityTarget || '',
+                category: selectedCategory || '',
+                subCategory: selectedSubcategory || ''
             });
 
-            // Handle success response
-            console.log('Data saved successfully:', response.data);
+            console.log(employeeData, "139", selectedCategory);
+            let eflags = [];
 
-            // Close the dialog
+            // Retrieve existing data from localStorage
+            let existingFlags = JSON.parse(localStorage.getItem('employeeFlag')) || [];
+
+            employeeData.processKpi.forEach((catElement) => {
+                if (catElement.categoryName === selectedCategory) {
+                    catElement.subcategories.forEach((scElement) => {
+                        if (scElement.subCategoryName === selectedSubcategory) {
+                            scElement.queries.forEach((qElement) => {
+                                if (qElement.metric === metric) {
+                                    // Update qElement properties based on addEmployeeMetrics
+                                    qElement.quantityAchieved = addEmployeeMetrics.quantityAchieved;
+                                    qElement.empIndex = addEmployeeMetrics.eIndex;
+                                    qElement.empComments = addEmployeeMetrics.empComments;
+                                    qElement.employeeFlag = addEmployeeMetrics.employeeFlag === false ? true : addEmployeeMetrics.employeeFlag;
+
+
+
+
+                                    setAddEmployeeMetrics({
+                                        'quantityAchieved': '',
+                                        'eIndex': '',
+                                        'empComments': '',
+                                        'employeeFlag': false,
+                                        'managerFlag': false,
+                                        'directorFlag': false
+                                    })
+                                    // Store only the updated employeeFlag property in localStorage
+                                    let obj = {
+                                        metric: qElement.metric,
+                                        employeeStatus: qElement.employeeFlag,
+                                    }
+                                    eflags.push(obj);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Append new data to existing data
+            let updatedFlags = existingFlags.concat(eflags);
+
+            // Store the updated data back into localStorage
+            localStorage.setItem('employeeFlag', JSON.stringify(updatedFlags));
+
             setOpenDialog(false);
+            showFlags();
         } catch (error) {
-            console.error('Error saving data:', error);
+            console.error('Error saving data to localStorage:', error);
         }
     };
+
+
+
+
+    const showFlags = () => {
+        // Retrieve the value from localStorage
+
+        // Check if the value exists and is not empty
+        if (storedValue) {
+            try {
+                // Parse the stringified value
+                var parsedValue = JSON.parse(storedValue);
+
+                // Now you can use the parsed value
+                console.log(parsedValue, '198');
+                parsedValue.forEach((ele) => {
+                    console.log(typeof (selectedQuery.metric), '203');
+                    if (ele.metric === selectedQuery.metric) {
+                        setEmployFlag(ele.employeeStatus)
+
+                    }
+
+                })
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
+        } else {
+            console.log('No value found in localStorage for key "employeeFlag"');
+        }
+
+
+    }
+
+    const handleVisibilityIconClick = (data) => {
+        handleOpenDialog(data);
+    }
+
+
+
+    const saveKPIData = async (apiCallData) => {
+        let processKPI = apiCallData.processKpi;
+
+        const quarterData = {
+            "empId": 5669,
+            "firstName": "Vandana",
+            "lastName": "Kottapalli",
+            "email": "vkottapalli",
+            "role": "employee",
+            "practice": "js",
+            "password": "vandana@123",
+            "location": "Miracle City",
+            "managerName": "John",
+            "directorName": "Prasad",
+            "hrName": "Divya",
+            "profileImag": "vandana.png",
+            "Quater": [
+                {
+                    "quater": "Q1",
+                    "year": "2024",
+                    processKPI
+                }
+            ]
+        };
+
+        console.log(quarterData, '341');
+
+        try {
+            const response = await fetch('http://172.17.15.253:4000/api/registerEmployee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quarterData)
+            });
+
+            if (response.ok) {
+                console.log('Data posted successfully');
+            } else {
+                console.error('Error posting data');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+        }
+    };
+
+    var displayData;
+
+    useEffect(() => {
+        const fetchQuarterData = async () => {
+            try {
+                const response = await axios.get(`http://172.17.15.253:4000/api/getEmployee/${5669}`);
+                setQuarterEmpData(response.data);
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+            }
+        };
+
+        fetchQuarterData();
+    }, []);
+
+
+    console.log(displayData, '309');
+
+    const selectedQuarterData = displayData?.Quater?.find(quarter => quarter.quater === kpiQuarter);
+    const selectedCategoryData = selectedQuarterData?.processKPI?.find(category => category.categoryName === selectedCategory);
+    const selectedSubcategoryData = selectedCategoryData?.subcategories?.find(subcategory => subcategory.subCategoryName === selectedSubcategory);
+    const queriesData = selectedSubcategoryData?.queries || [];
+
 
 
 
     return (
         <div style={{ paddingTop: '60px' }}> {/* Add padding to clear the top */}
-            <AppBar position="fixed" style={{ height: '60px', backgroundColor: '#00aaee', zIndex: '1000' }}>
-                <Toolbar>
-                    <Typography variant="h6">Your Header</Typography>
-                </Toolbar>
-            </AppBar>
+            <EmployeeHeader />
             <Grid container style={{ height: 'calc(100vh - 60px)' }}>
 
                 <Grid item xs={1.5} style={{ backgroundColor: '#2b2b2b' }}>
-                    <ul style={{ listStyle: 'none' }}>
+                    <ul style={{ listStyle: 'none', paddingLeft: 0, fontFamily: 'roboto' }}>
                         {kpiQuarter.map((quarterData, index) => (
                             <li key={index}><br />
                                 <span
@@ -167,7 +334,7 @@ export default function EmployeeData() {
                                     }}
 
                                 >
-                                    <img src='https://cdn-icons-png.flaticon.com/128/3602/3602488.png' style={{ width: '20px', color: 'white' }} /> &nbsp;
+                                    {/* <img src='https://cdn-icons-png.flaticon.com/128/3602/3602488.png' style={{ width: '20px', color: 'white' }} /> &nbsp; */}
                                     Quarter {index + 1}
                                 </span>
                             </li>
@@ -247,24 +414,32 @@ export default function EmployeeData() {
                     <div style={{}}>
                         <Card style={{ height: '100%', marginLeft: '20px', marginTop: '20px', backgroundColor: '#ecedf0' }}>
                             <CardContent>
-                                <h3 style={{ textAlign: 'left', fontFamily: 'roboto' }}>KPI Category</h3>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div>
+                                        <h3 style={{ textAlign: 'left', fontFamily: 'roboto' }}>KPI Category</h3>
+                                    </div>
+                                    <div style={{ marginLeft: 'auto' }}>
+                                        <Button style={{ backgroundColor: '#00aaee', color: 'white' }} onClick={(e) => { saveKPIData(employeeData, console.log(employeeData, '315')) }}>Save KPI</Button>
+                                    </div>
+                                </div>
+
                                 {kpiQuarter.map((quarterData, index) => (
                                     <div key={index} style={{ display: expandedQuarter === index ? 'block' : 'none' }}>
                                         {employeeData.processKpi?.map((category, categoryIndex) => (
                                             <div key={categoryIndex}>
-                                                <Card onClick={() => toggleCategory(category.categoryName, console.log(category.categoryName, "255") ) } style={{ marginBottom: '10px' }}>
+                                                <Card onClick={() => toggleCategory(category.categoryName, console.log(category.categoryName, "255"))} style={{ marginBottom: '10px' }}>
                                                     <Tooltip title='Click to see the subCategories' arrow>
                                                         <p style={{ fontSize: '16px', textAlign: 'left', marginLeft: '20px', fontFamily: 'roboto' }}>
-                                                            <b>{category.categoryName}</b>
+                                                            <b style={{ cursor: 'pointer' }}>{category.categoryName}</b>
                                                         </p>
                                                     </Tooltip>
                                                 </Card>
                                                 {selectedCategory === category.categoryName && (
-                                                    
+console.log(selectedCategory, '438'),
                                                     <div>
                                                         <Tabs value={selectedSubcategory}>
                                                             {category.subcategories?.map((subcategory, subcategoryIndex) => (
-                                                                
+                                                                console.log(category.subcategories, '442'),
                                                                 <Tab style={{ color: 'black' }}
                                                                     key={subcategoryIndex}
                                                                     label={subcategory.subCategoryName}
@@ -275,13 +450,13 @@ export default function EmployeeData() {
                                                         </Tabs>
                                                         <div>
                                                             {category.subcategories?.map((subcategory, subcategoryIndex) => (
-                                                                
+
                                                                 <div key={subcategoryIndex}>
                                                                     {selectedSubcategory === subcategory.subCategoryName && (
-                                                                        
+
                                                                         <div>
                                                                             {subcategory.queries.map((query, queryIndex) => (
-                                                                                
+                                                                                console.log(subcategory.queries, 'bfs'),
                                                                                 <Card
                                                                                     key={queryIndex}
                                                                                     style={{ backgroundColor: queryIndex % 2 === 0 ? '#f9f9f9' : '#daeef5' }}
@@ -297,9 +472,31 @@ export default function EmployeeData() {
                                                                                         </div>
 
 
+
+                                                                                        <div>
+                                                                                            <Stack direction="row" spacing={2}>
+
+
+                                                                                                <Tooltip title={query.employeeFlag !== undefined ? (query.employeeFlag ? 'Employee submitted this metric' : 'Employee not submitted yet') : ''}>
+                                                                                                    <Avatar sx={{ bgcolor: query.employeeFlag !== undefined ? (query.employeeFlag ? blueGrey[700] : blueGrey[100]) : blueGrey[100], width: 24, height: 24, fontSize: '10px' }}>E</Avatar>
+                                                                                                </Tooltip>
+
+
+                                                                                                <Tooltip>
+                                                                                                    <Avatar sx={{ width: 24, height: 24, fontSize: '10px', }}>M</Avatar>
+                                                                                                </Tooltip>
+                                                                                                <Tooltip>
+                                                                                                    <Avatar sx={{ width: 24, height: 24, fontSize: '10px', }}>D</Avatar>
+                                                                                                </Tooltip>
+                                                                                            </Stack>
+                                                                                        </div>
+
+
+
+
                                                                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                                             <Button onClick={() => toggleQuery(query)}><AddCircleOutlineIcon /></Button>
-                                                                                            <Button><VisibilityIcon /></Button>
+                                                                                            <Button onClick={() => handleVisibilityIconClick(query)}><VisibilityIcon /></Button>
                                                                                         </div>
                                                                                     </div>
                                                                                 </Card>
@@ -308,7 +505,7 @@ export default function EmployeeData() {
                                                                                 <DialogTitle>Query Details</DialogTitle>
                                                                                 <DialogContent>
                                                                                     {selectedQuery && (
-                                                                                        
+
                                                                                         <div>
                                                                                             <b>{selectedQuery.metric}</b><br />
                                                                                             <b>Quantity Target:</b> {selectedQuery.quantityTarget}<br /><br />
@@ -332,25 +529,35 @@ export default function EmployeeData() {
                                                                                                         <TableCell>
                                                                                                             <TextField
                                                                                                                 id="quantityAchieved"
-                                                                                                                value={selectedQuery?.quantityAchieved || ''}
-                                                                                                                onChange={(e) => handleInputChange(e, 'quantityAchieved', console.log(selectedQuery, '336'),)}
+                                                                                                                value={addEmployeeMetrics.quantityAchieved || ''}
+                                                                                                                onChange={(e) => setAddEmployeeMetrics(prevState => ({
+                                                                                                                    ...prevState,
+                                                                                                                    quantityAchieved: e.target.value
+                                                                                                                }))}
                                                                                                             />
                                                                                                         </TableCell>
                                                                                                         <TableCell>
                                                                                                             <TextField
                                                                                                                 id="eIndexInput"
-                                                                                                                value={selectedQuery?.eIndex || ''}
-                                                                                                                onChange={(e) => handleInputChange(e, 'eIndex')}
+                                                                                                                value={addEmployeeMetrics.eIndex || ''}
+                                                                                                                onChange={(e) => setAddEmployeeMetrics(prevState => ({
+                                                                                                                    ...prevState,
+                                                                                                                    eIndex: e.target.value
+                                                                                                                }))}
                                                                                                             />
                                                                                                         </TableCell>
                                                                                                         <TableCell>
                                                                                                             <TextField
                                                                                                                 id="empCommentsInput"
                                                                                                                 multiline
-                                                                                                                value={selectedQuery?.empComments || ''}
-                                                                                                                onChange={(e) => handleInputChange(e, 'empComments')}
+                                                                                                                value={addEmployeeMetrics.empComments || ''}
+                                                                                                                onChange={(e) => setAddEmployeeMetrics(prevState => ({
+                                                                                                                    ...prevState,
+                                                                                                                    empComments: e.target.value
+                                                                                                                }))}
                                                                                                             />
                                                                                                         </TableCell>
+
                                                                                                     </TableRow>
                                                                                                 </TableBody>
                                                                                             </Table>
@@ -393,12 +600,36 @@ export default function EmployeeData() {
                                                                                     )}
                                                                                 </DialogContent>
                                                                                 <DialogActions>
-                                                                                    <Button >Save</Button>
+                                                                                    <Button onClick={handleSectionSave}>Save</Button>
                                                                                     <Button onClick={handleCloseDialog}>Close</Button>
                                                                                 </DialogActions>
                                                                             </Dialog>
 
-
+                                                                            <Dialog open={dialogOpen} onClose={handleCloseViewDialog}>
+                                                                                <DialogTitle>Query Details</DialogTitle>
+                                                                                <DialogContent>
+                                                                                    <TableContainer component={Paper}>
+                                                                                        <Table>
+                                                                                            <TableHead>
+                                                                                                <TableRow>
+                                                                                                    <TableCell>Quantity Achieved</TableCell>
+                                                                                                    <TableCell>Employee Index</TableCell>
+                                                                                                    <TableCell>Employee Comments</TableCell>
+                                                                                                </TableRow>
+                                                                                            </TableHead>
+                                                                                            <TableBody>
+                                                                                                {queriesData.map(query => (
+                                                                                                    <TableRow key={query._id}>
+                                                                                                        <TableCell>{query.quantityAchieved}</TableCell>
+                                                                                                        <TableCell>{query.empIndex}</TableCell>
+                                                                                                        <TableCell>{query.empComments}</TableCell>
+                                                                                                    </TableRow>
+                                                                                                ))}
+                                                                                            </TableBody>
+                                                                                        </Table>
+                                                                                    </TableContainer>
+                                                                                </DialogContent>
+                                                                            </Dialog>
 
                                                                         </div>
                                                                     )}
@@ -415,9 +646,7 @@ export default function EmployeeData() {
                             </CardContent>
                         </Card>
                     </div>
-                    <Button onClick={handleSave}>
-                        Submit
-                    </Button>
+
                 </Grid >
 
             </Grid >

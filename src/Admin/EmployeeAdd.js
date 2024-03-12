@@ -179,7 +179,7 @@ export default function MyTable(props) {
         // Perform POST request with formattedData
         console.log('Formatted Data:', formattedData);
         // Example POST request using fetch
-        fetch('http://172.17.15.150:8080/api/addMetrics', {
+        fetch('http://172.17.15.253:8080/api/addMetrics', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
