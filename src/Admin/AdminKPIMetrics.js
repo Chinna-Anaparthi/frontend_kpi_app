@@ -84,6 +84,7 @@ export default function AdminKPIMetrics() {
   const [metricsID, setMetricsID] = useState(null)
   const [method, setMethod] = useState();
   const [apiGet, setApiGet] = useState();
+  const [metricData, setMetricData] = useState();
   const [employeeKPI, setEmployeeKPI] = useState();
   const [managerKPI, setManagerKPI] = useState([]);
   const [directorKPI, setDirectorKPI] = useState();
@@ -102,10 +103,14 @@ export default function AdminKPIMetrics() {
 
   console.log(metricsApiGet, '103');
 
+  useEffect(() => {
+    callKPIMetrics()
+    getAllRoleMetrics()
+  }, [])
+
   const handleClick = () => {
     setOpenSnack(true);
   };
-
 
 
   const handleCloseSnack = (event, reason) => {
@@ -116,63 +121,122 @@ export default function AdminKPIMetrics() {
     setOpenSnack(false);
   };
 
-  useEffect(() => {
-    callKPIMetrics()
 
-  }, [])
   const callKPIMetrics = () => {
-    // fetch('http://172.17.15.253:4000/api/getMetrics')
-    // .then((response) => response.json())
-    // .then((data) => {
-    //   console.log(data, '91');
-    //   setApiGet(data.response)
-    // })
-    // .catch((error) => {
-    //   console.error('Error fetching data:', error);
-    // })
-    setSelectedRole('KPI Metrics')
+    setSelectedRole('KPI Metrics');
     fetch('http://172.17.15.253:4000/api/getCategoryQuestions')
       .then((response) => response.json())
       .then((response) => {
-
-        setMetricsID(response.data[0]._id)
+        setMetricsID(response.data[0]._id);
         setMetricsApiGet(response.data);
+        console.log(response.data, 'Metrics API Data'); // Log the data here
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  };
 
+  useEffect(() => {
+    console.log(metricsApiGet, 'Metrics API Get');
+  }, [metricsApiGet]);
+
+  useEffect(() => {
+    setMethod('get');
+  }, []);
+
+  const getAllRoleMetrics = () => {
+    fetch('http://172.17.15.253:4000/api/getMetrics')
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.response, '140');
+        setMetricData(data.response)
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       })
   }
 
-  useEffect(() => {
-    setMethod('get');
-  }, []);
-
-
-
-
 
   // For Manager API ROLE
-  const handleSelectedRole = (mrole) => {
-    if (mrole === 'Manager') {
-      setSelectedRole('Manager')
-      fetch('http://172.17.15.253:4000/api/getMetrics/manager')
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.response, '91');
-          setManagerKPI(data.response)
-          // setApiGet(data.response)
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        })
+  const handleSelectedRole = (mrole, mData) => {
+    console.log(mData, '162');
+
+    if (mrole === "KPI Metrics") {
+      callKPIMetrics();
+      setSelectedRole("KPI Metrics");
+    } else {
+      mData.forEach((element) => {
+        let managerRole = element.role === "manager" ? "Manager" : "";
+        let employeeRole = element.role === "employee" ? "Employee" : "";
+        let directorRole = element.role === "director" ? "Director" : "";
+
+        if (mrole === managerRole) {
+          setSelectedRole("Manager");
+          console.log(element, "153m");
+          setManagerKPI(element);
+        }
+        if (mrole === employeeRole) {
+          setSelectedRole("Employee");
+          setEmployeeKPI(element);
+        }
+        if (mrole === directorRole) {
+          setSelectedRole("Director");
+          setDirectorKPI(element);
+        }
+      });
     }
-    console.log(mrole, "160");
-    if (mrole === 'KPI Metrics') {
-      callKPIMetrics()
-      setSelectedRole('KPI Metrics')
-    }
-  }
+  };
+
+  // const handleSelectedRole = (mrole) => {
+  //   if (mrole === 'Manager') {
+  //     setSelectedRole('Manager')
+  //     fetch('http://172.17.15.253:4000/api/getMetrics/manager')
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.response, '91');
+  //         setManagerKPI(data.response)
+  //         // setApiGet(data.response)
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching data:', error);
+  //       })
+  //   }
+  //   console.log(mrole, "160");
+  //   if (mrole === 'KPI Metrics') {
+  //     callKPIMetrics()
+  //     setSelectedRole('KPI Metrics')
+  //   }
+  //   if (mrole === 'Employee') {
+  //     setSelectedRole('Employee')
+  //     fetch('http://172.17.15.253:4000/api/getMetrics/employee')
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.response, '91');
+  //         setEmployeeKPI(data.response)
+  //         // setApiGet(data.response)
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching data:', error);
+  //       })
+  //   }
+  //   if (mrole === 'Director') {
+  //     setSelectedRole('Director')
+  //     fetch('http://172.17.15.253:4000/api/getMetrics/director')
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.response, '91');
+  //         setEmployeeKPI(data.response)
+  //         // setApiGet(data.response)
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching data:', error);
+  //       })
+  //   }
+  // }
+
+
+
+
 
 
   const handleDrawerOpen = () => {
@@ -198,6 +262,19 @@ export default function AdminKPIMetrics() {
     setMetrics(value);
     setIsSaveDisable(true)
   };
+
+  const handleDeleteCategory = (index) => {
+    setCategory((prevCategory) => prevCategory.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteSubCategory = (index) => {
+    setSubCategory((prevSubCategory) => prevSubCategory.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteMetric = (index) => {
+    setMetrics((prevMetrics) => prevMetrics.filter((_, i) => i !== index));
+  };
+
 
   const handleSave = (value1, value2, value3) => {
     console.log("IN KPI 182");
@@ -241,9 +318,9 @@ export default function AdminKPIMetrics() {
           if (response.ok) {
             console.log(response, '182');
             // setMetricsApiPost(reqBody);
-            console.log('Data posted successfully');
+            console.log('Data updated successfully');
           } else {
-            console.error('Error posting data');
+            console.error('Error updating data');
           }
         })
         .catch((error) => {
@@ -385,7 +462,7 @@ export default function AdminKPIMetrics() {
                   backgroundColor: selectedRole === role ? '#f0f0f0' : 'inherit',
                   color: selectedRole === role ? 'black' : 'inherit',
                 }}
-                onClick={() => handleSelectedRole(role)}
+                onClick={() => handleSelectedRole(role,metricData)}
               >
                 <ListItem key={role} disablePadding>
                   {role}
@@ -409,6 +486,7 @@ export default function AdminKPIMetrics() {
                       label="Category"
                       value={category}
                       onChange={(chip) => handleAddCategory(chip)}
+                      onDelete={(chip, index) => handleDeleteCategory(index)}
                     />
                   </Box>
                 </div>
@@ -423,6 +501,7 @@ export default function AdminKPIMetrics() {
                       value={subCategory}
                       onChange={(chip) => handleAddSubCategory(chip)}
                       disabled={!isChipInputSubDisabled}
+                      onDelete={(chip, index) => handleDeleteSubCategory(index)}
                     />
                   </Box>
                 </div>
@@ -437,10 +516,12 @@ export default function AdminKPIMetrics() {
                       value={metrics}
                       onChange={(chip) => handleAddMetric(chip)}
                       disabled={!isChipInputMetricDisabled}
+                      onDelete={(chip, index) => handleDeleteMetric(index)}
                     />
                   </Box>
                 </div>
               )}
+
               {selectedRole === "KPI Metrics" && (
                 <Button
                   variant='outlined'
@@ -482,35 +563,21 @@ export default function AdminKPIMetrics() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {metricsApiGet.map((row, index) => (
-                      <React.Fragment key={index}>
-                        {/* Render category data */}
-                        {row.category.map((categoryItem, categoryIndex) => (
-                          <TableRow key={`category-${index}-${categoryIndex}`}>
-                            <TableCell>{categoryItem}</TableCell>
-                            <TableCell></TableCell> {/* Empty TableCell for subCategory */}
-                            <TableCell></TableCell> {/* Empty TableCell for metrics */}
-                          </TableRow>
-                        ))}
-                        {/* Render subCategory data */}
-                        {row.subCategory.map((subCategoryItem, subCategoryIndex) => (
-                          <TableRow key={`subCategory-${index}-${subCategoryIndex}`}>
-                            <TableCell></TableCell> {/* Empty TableCell for category */}
-                            <TableCell>{subCategoryItem}</TableCell>
-                            <TableCell></TableCell> {/* Empty TableCell for metrics */}
-                          </TableRow>
-                        ))}
-                        {/* Render metrics data */}
-                        {row.metrics.map((metricsItem, metricsIndex) => (
-                          <TableRow key={`metrics-${index}-${metricsIndex}`}>
-                            <TableCell></TableCell> {/* Empty TableCell for category */}
-                            <TableCell></TableCell> {/* Empty TableCell for subCategory */}
-                            <TableCell>{metricsItem}</TableCell>
-                          </TableRow>
-                        ))}
-                      </React.Fragment>
-                    ))}
+                    {metricsApiGet.map((dataItem, dataIndex) => {
+                      // Get the maximum length among the three arrays
+                      const maxLength = Math.max(dataItem.category.length, dataItem.subCategory.length, dataItem.metrics.length);
+
+                      // Iterate over the maximum length
+                      return [...Array(maxLength)].map((_, index) => (
+                        <TableRow key={`row-${dataIndex}-${index}`}>
+                          <TableCell>{dataItem.category[index]}</TableCell>
+                          <TableCell>{dataItem.subCategory[index]}</TableCell>
+                          <TableCell>{dataItem.metrics[index]}</TableCell>
+                        </TableRow>
+                      ));
+                    })}
                   </TableBody>
+
 
 
                 </Table>

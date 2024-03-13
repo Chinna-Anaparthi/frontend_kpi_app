@@ -43,7 +43,7 @@ export default function EmployeeData() {
         // Fetch employee data from the API
         const fetchEmployeeData = async () => {
             try {
-                const response = await axios.get('http://172.17.15.253:4000/api/getMetrics/manager');
+                const response = await axios.get('http://172.17.15.253:4000/api/getMetrics/employee');
                 setEmployeeData(response.data.response[0]);
                 localStorage.setItem('employeeKPI', JSON.stringify(response.data.response[0]));
                 console.log(response.data.response, '25');
